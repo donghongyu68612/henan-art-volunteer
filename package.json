@@ -1,0 +1,21 @@
+{
+  "name": "henan-art-volunteer",
+  "version": "2.3.0",
+  "description": "河南艺术生志愿填报助手 — 智能推荐·冲稳保分析·一键导出PDF",
+  "private": true,
+  "scripts": {
+    "build": "node scripts/build.js",
+    "icons": "node scripts/generate-icons.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/donghongyu68612/henan-art-volunteer.git"
+  },
+  "keywords": ["高考志愿", "艺术生", "河南", "志愿填报", "PWA"],
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/donghongyu68612/henan-art-volunteer/issues"
+  },
+  "homepage": "https://github.com/donghongyu68612/henan-art-volunteer#readme"
+}
