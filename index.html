@@ -1,9 +1,9 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>河南艺术生志愿填报助手 2026 v2.1</title>
+<title>河南艺术生志愿填报助手 v2.3</title>
 <link rel="manifest" href="manifest.json">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -126,9 +126,6 @@ body{
 .info-row .label{color:var(--text-light);}
 .info-row .value{font-weight:600;}
 @media(min-width:480px){body{border-left:1px solid #eee;border-right:1px solid #eee;}}
-.status-item{flex:1;text-align:center;padding:8px;background:var(--card-bg);border-radius:8px;box-shadow:var(--shadow);}
-.status-item .num{font-size:1.1rem;font-weight:700;}
-.status-item .label{font-size:0.7rem;color:var(--text-light);}
 .compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
 .compare-card{background:var(--card-bg);border-radius:8px;padding:12px;text-align:center;box-shadow:var(--shadow);position:relative;}
 .compare-card .remove-btn{position:absolute;top:4px;right:4px;background:#e74c3c;color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:0.7rem;cursor:pointer;line-height:20px;}
@@ -161,8 +158,8 @@ body{
 <!-- Page: Home -->
 <div id="page-home" class="page active">
   <div class="header">
-    <h1>🎯 河南艺术生志愿填报助手 2026</h1>
-    <p>智能推荐 · 冲稳保分析 · 一键导出 · v2.1</p>
+    <h1>🎯 河南艺术生志愿填报助手</h1>
+    <p>智能推荐·冲稳保分析·一键导出2026 <span>v2.3 new</span></p>
   </div>
   <div style="display:flex;gap:8px;margin-bottom:16px;">
     <div style="flex:1;text-align:center;padding:12px 6px;background:var(--card-bg);border-radius:var(--radius);box-shadow:var(--shadow);">
@@ -197,14 +194,26 @@ body{
     </div>
     <div class="form-group"><label>统考专业分</label><input type="number" id="input-prof" placeholder="例: 245" min="0" max="300"></div>
     <div class="form-group"><label>文化课成绩</label><input type="number" id="input-culture" placeholder="例: 420" min="0" max="750"></div>
-    <div class="form-group"><label>全省排名（选填）</label><input type="number" id="input-rank" placeholder="例: 5000" min="1"></div>
+    <div class="form-group">
+      <label>综合分计算公式</label>
+      <select id="input-formula">
+        <option value="w5z5" selected>文5专5（默认）：文化×0.5 + 专业×1.25</option>
+        <option value="w6z4">文6专4：文化×0.6 + 专业×1.0</option>
+        <option value="w7z3">文7专3：文化×0.7 + 专业×0.75</option>
+        <option value="w8z2">文8专2：文化×0.8 + 专业×0.5</option>
+        <option value="culture">仅文化：按文化分排序</option>
+      </select>
+    </div>
     <div class="form-group" style="margin-bottom:0;">
-      <label>批次偏好</label>
-      <select id="input-batch"><option value="all">全部批次</option><option value="提前批">提前批</option><option value="本科A段">本科A段</option><option value="本科B段">本科B段</option><option value="专科">专科</option></select>
+      <label>综合分数</label>
+      <div style="display:flex;gap:8px;">
+        <div id="calc-preview" style="flex:1;padding:12px 14px;background:#f5f6fa;border-radius:8px;border:1px dashed #ccc;font-size:1rem;color:var(--text-light);text-align:center;">点击「计算」查看综合分</div>
+        <button class="btn btn-secondary btn-small" onclick="app.liveCalc()" style="white-space:nowrap;padding:12px 16px;">计算</button>
+      </div>
     </div>
   </div>
   <button class="btn btn-primary" onclick="app.recommend()" style="margin-top:8px;">🎯 智能推荐院校</button>
-    数据仅供参考，请以《招生考试之友》官方公布为准<br>内置45所院校模拟数据 · 支持自定义数据导入</p>
+    数据仅供参考，请以《招生考试之友》官方公布为准<br>内置95所院校模拟数据</p>
 </div>
 
 <!-- Page: Recommend -->
@@ -220,12 +229,8 @@ body{
       <span style="font-weight:600;color:var(--primary);" id="show-total">综合: -</span>
     </div>
   </div>
-  <div class="card" style="padding:12px;margin-bottom:8px;">
-    <div style="display:flex;gap:8px;text-align:center;">
-      <div class="status-item"><div class="num" id="stat-chong" style="color:var(--primary);">0</div><div class="label">🔼 冲刺</div></div>
-      <div class="status-item"><div class="num" id="stat-wen" style="color:var(--orange);">0</div><div class="label">➡️ 稳妥</div></div>
-      <div class="status-item"><div class="num" id="stat-bao" style="color:var(--green);">0</div><div class="label">⬇️ 保底</div></div>
-    </div>
+  <div class="card" style="padding:8px 12px;margin-bottom:8px;overflow:hidden;">
+    <div style="font-size:0.85rem;"><span id="stat-chong">0</span> 冲刺 · <span id="stat-wen">0</span> 稳妥 · <span id="stat-bao">0</span> 保底</div>
   </div>
   <div class="filter-bar" id="filter-bar">
     <div class="filter-btn active" data-f="all" onclick="app.setFilter(this,'all')">全部</div>
@@ -286,52 +291,17 @@ body{
   </div>
 </div>
 
-<!-- Page: Tools -->
-<div id="page-tools" class="page">
-  <div class="header"><h1>🧰 辅助工具</h1><p>综合分计算 · 同位分换算 · 院校地图</p></div>
-  <div class="card">
-    <h3><i class="fas fa-calculator" style="color:var(--blue);"></i> 综合分计算器</h3>
-    <p style="font-size:0.8rem;color:var(--text-light);margin-bottom:10px;">河南美术类综合分 = 专业×1.25 + 文化×0.5</p>
-    <div class="form-group"><label>统考专业分</label><input type="number" id="calc-prof" placeholder="例: 245" min="0"></div>
-    <div class="form-group"><label>文化课成绩</label><input type="number" id="calc-culture" placeholder="例: 420" min="0"></div>
-    <button class="btn btn-primary btn-small" onclick="app.calcTool()">计算</button>
-    <div id="calc-result" class="calc-result" style="display:none;"><div class="label">综合分</div><div class="num" id="calc-total-num">0</div></div>
-  </div>
-  <div class="card">
-    <h3><i class="fas fa-exchange-alt" style="color:var(--primary);"></i> 同位分换算器</h3>
-    <p style="font-size:0.8rem;color:var(--text-light);margin-bottom:10px;">将当年综合分换算为往年等效分</p>
-    <div class="form-group"><label>当年综合分</label><input type="number" id="eq-score" placeholder="例: 320" min="0"></div>
-    <div class="form-group"><label>当年排名</label><input type="number" id="eq-rank" placeholder="例: 5000" min="1"></div>
-    <button class="btn btn-primary btn-small" onclick="app.calcEquivalent()">换算</button>
-    <div id="eq-result" class="calc-result" style="display:none;"><div class="label">2025年等效综合分（约）</div><div class="num" id="eq-num">0</div></div>
-  </div>
-  <div class="card">
-    <h3><i class="fas fa-map-marked-alt" style="color:var(--purple);"></i> 院校地区分布</h3>
-    <p style="font-size:0.8rem;color:var(--text-light);margin-bottom:8px;">按地区查看院校分布情况，点击地区查看院校</p>
-    <div id="region-tags"></div>
-    <div class="map-wrap" id="city-chart"></div>
-    <div id="region-schools"></div>
-  </div>
-  <div class="card">
-    <h3 style="margin-bottom:8px;">📌 数据说明</h3>
-    <div class="info-row"><span class="label">数据年份</span><span class="value">2023-2025</span></div>
-    <div class="info-row"><span class="label">更新日期</span><span class="value">2026-06-12</span></div>
-    <div class="info-row"><span class="label">数据来源</span><span class="value">河南省教育考试院官方公开数据</span></div>
-  </div>
-</div>
-
 <!-- Page: About -->
-<div id="page-about" class="page">
+<div id="page-about" class="page" style="overflow-x:hidden;">
   <div class="header"><h1>ℹ️ 关于</h1><p>河南艺术生志愿填报助手 2026</p></div>
   <div class="card">
     <h3>🎯 使用说明</h3>
-    <ol style="padding-left:20px;font-size:0.85rem;color:var(--text-light);line-height:2.2;">
+    <ol style="padding-left:16px;font-size:0.8rem;color:var(--text-light);line-height:2;">
       <li>首页输入考生专业分、文化分和排名</li>
       <li>系统基于近三年录取数据智能推荐，冲稳保分层</li>
       <li>支持加入收藏 ❤️ 和院校对比 ⚖️</li>
       <li>在方案页查看分层，可导出PDF或复制文本</li>
-      <li>工具页查看院校地区分布地图🗺️</li>
-    </ol>
+          </ol>
   </div>
   <div class="card">
     <h3>⚠️ 重要声明</h3>
@@ -340,49 +310,15 @@ body{
       最终志愿请以 <strong>《招生考试之友》</strong> 和 <strong>河南省教育考试院官网</strong> 公布为准。
     </p>
   </div>
-  <div class="card">
-    <h3>📊 综合分计算公式</h3>
-    <div class="info-row"><span class="label">美术与设计类</span><span class="value">专业×1.25 + 文化×0.5</span></div>
-    <div class="info-row"><span class="label">音乐类</span><span class="value">专业×1.25 + 文化×0.5</span></div>
-    <div class="info-row"><span class="label">舞蹈类</span><span class="value">专业×1.25 + 文化×0.5</span></div>
-    <div class="info-row"><span class="label">播音与主持类</span><span class="value">专业×1.0 + 文化×0.667</span></div>
-    <div class="info-row"><span class="label">表（导）演类</span><span class="value">专业×1.25 + 文化×0.5</span></div>
-    <div class="info-row"><span class="label">书法类</span><span class="value">专业×1.25 + 文化×0.5</span></div>
-  <div class="card" style="margin-top:12px;">
-    <h3><i class="fas fa-database" style="color:var(--green);"></i> 数据导入（CSV/Excel）</h3>
-    <p style="font-size:0.8rem;color:var(--text-light);margin-bottom:8px;">
-      从河南省教育考试院官网或《招生考试之友》复制数据，按格式粘贴导入
-    </p>
-    <div class="form-group">
-      <label>数据格式说明</label>
-      <div style="font-size:0.75rem;background:#f5f6fa;padding:8px;border-radius:6px;line-height:1.8;color:var(--text-light);">
-        每行一所院校，用逗号分隔：<br>
-        <code>院校名称,城市,类型,批次,专业,计划数,2025综合分,2024综合分,2023综合分</code>
-      </div>
-    </div>
-    <div class="form-group">
-      <label>粘贴院校数据</label>
-      <textarea id="import-data" rows="6" style="width:100%;padding:10px;border:1.5px solid #ddd;border-radius:8px;font-size:0.8rem;font-family:monospace;outline:none;resize:vertical;" placeholder="示例：
-郑州大学,郑州,公办,本科A段,视觉传达设计,85,550,542,535
-河南大学,开封,公办,本科A段,美术学,120,535,530,522"></textarea>
-    </div>
-    <div style="display:flex;gap:8px;">
-      <button class="btn btn-primary btn-small" onclick="app.importData()" style="flex:1;"><i class="fas fa-upload"></i> 导入数据</button>
-      <button class="btn btn-secondary btn-small" onclick="app.exportData()" style="flex:1;"><i class="fas fa-download"></i> 导出当前数据</button>
-      <button class="btn btn-secondary btn-small" onclick="app.resetData()" style="flex:1;"><i class="fas fa-undo"></i> 恢复默认</button>
-    </div>
-    <div id="import-status" style="margin-top:8px;font-size:0.8rem;color:var(--green);display:none;"></div>
-  </div>
-  </div>
 </div>
 <nav class="bottom-nav">
-    try{if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(function(e){console.warn('SW reg failed',e);});}}catch(e){}
+  <div class="nav-item active" data-p="page-home" onclick="app.nav('page-home')"><i class="fas fa-home"></i><div>首页</div></div>
+  <div class="nav-item" data-p="page-recommend" onclick="app.nav('page-recommend')"><i class="fas fa-star"></i><div>推荐</div></div>
   <div class="nav-item" data-p="page-compare" onclick="app.nav('page-compare')"><i class="fas fa-balance-scale"></i><div>对比</div></div>
   <div class="nav-item" data-p="page-plan" onclick="app.nav('page-plan')">
     <i class="fas fa-clipboard-list"></i><div>方案</div>
     <span class="badge badge-count" id="plan-badge" style="display:none;background:var(--primary);">0</span>
   </div>
-  <div class="nav-item" data-p="page-tools" onclick="app.nav('page-tools')"><i class="fas fa-tools"></i><div>工具</div></div>
   <div class="nav-item" data-p="page-about" onclick="app.nav('page-about')"><i class="fas fa-info-circle"></i><div>关于</div></div>
 </nav>
 <script>
@@ -390,402 +326,496 @@ body{
 const DB = {
   // 河南艺术类综合分计算公式
   formulas: {
-    '美术与设计类': { profWeight:1.25, cultureWeight:0.5, label:'专业×1.25 + 文化×0.5' },
-    '音乐类':       { profWeight:1.25, cultureWeight:0.5, label:'专业×1.25 + 文化×0.5' },
-    '舞蹈类':       { profWeight:1.25, cultureWeight:0.5, label:'专业×1.25 + 文化×0.5' },
-    '播音与主持类': { profWeight:1.0,  cultureWeight:0.667, label:'专业×1.0 + 文化×0.667' },
-    '表（导）演类': { profWeight:1.25, cultureWeight:0.5, label:'专业×1.25 + 文化×0.5' },
-    '书法类':       { profWeight:1.25, cultureWeight:0.5, label:'专业×1.25 + 文化×0.5' },
+    'w5z5': { profWeight:1.25, cultureWeight:0.5, label:'文5专5：文化×0.5+专业×1.25' },
+    'w6z4': { profWeight:1.0,  cultureWeight:0.6, label:'文6专4：文化×0.6+专业×1.0' },
+    'w7z3': { profWeight:0.75, cultureWeight:0.7, label:'文7专3：文化×0.7+专业×0.75' },
+    'w8z2': { profWeight:0.5,  cultureWeight:0.8, label:'文8专2：文化×0.8+专业×0.5' },
+    'culture': { profWeight:0, cultureWeight:1.0, label:'仅文化：按文化分排序' },
   },
   // 院校数据 - 45所真实风格
   schools: [
-    {id:1,name:"郑州大学",city:"郑州",region:"河南省内",type:"公办",level:"211/双一流",batch:"本科A段",
+    {id:1,name:"郑州大学",
+     schoolCode:"6000",city:"郑州",region:"河南省内",type:"公办",level:"211/双一流",batch:"本科A段",
      majors:["视觉传达设计","绘画","雕塑"],planCount:85,tuition:"8000元/年",
      desc:"国家211工程重点大学，艺术学科实力雄厚",tags:["公办","211"],
-     scores:{2025:{prof:258,culture:455,total:550},2024:{prof:255,culture:448,total:542},2023:{prof:252,culture:440,total:535}}},
-    {id:2,name:"河南大学",city:"开封",region:"河南省内",type:"公办",level:"双一流",batch:"本科A段",
+     scores:{2025:{prof:258,culture:455,total:550,rank:1418},2024:{prof:255,culture:448,total:542,rank:2410},2023:{prof:252,culture:440,total:535,rank:3753}}},
+    {id:2,name:"河南大学",
+     schoolCode:"6005",city:"开封",region:"河南省内",type:"公办",level:"双一流",batch:"本科A段",
      majors:["美术学","环境设计","动画"],planCount:120,tuition:"8000元/年",
      desc:"百年名校，双一流建设高校，美术学院历史悠久",tags:["公办","双一流"],
-     scores:{2025:{prof:250,culture:445,total:535},2024:{prof:248,culture:440,total:530},2023:{prof:245,culture:432,total:522}}},
-    {id:3,name:"河南农业大学",city:"郑州",region:"河南省内",type:"公办",batch:"本科A段",
+     scores:{2025:{prof:250,culture:445,total:535,rank:2120},2024:{prof:248,culture:440,total:530,rank:5341},2023:{prof:245,culture:432,total:522,rank:5873}}},
+    {id:3,name:"河南农业大学",
+     schoolCode:"6010",city:"郑州",region:"河南省内",type:"公办",batch:"本科A段",
      majors:["环境设计","产品设计"],planCount:60,tuition:"8000元/年",
      desc:"省属重点大学",tags:["公办"],
-     scores:{2025:{prof:233,culture:405,total:493},2024:{prof:230,culture:400,total:488},2023:{prof:228,culture:395,total:482}}},
-    {id:4,name:"河南师范大学",city:"新乡",region:"河南省内",type:"公办",batch:"本科A段",
+     scores:{2025:{prof:233,culture:405,total:493,rank:8869},2024:{prof:230,culture:400,total:488,rank:12829},2023:{prof:228,culture:395,total:482,rank:21146}}},
+    {id:4,name:"河南师范大学",
+     schoolCode:"6030",city:"新乡",region:"河南省内",type:"公办",batch:"本科A段",
      majors:["美术学","绘画","视觉传达设计"],planCount:90,tuition:"8000元/年",
      desc:"师范类院校，美术教育方向突出",tags:["公办"],
-     scores:{2025:{prof:230,culture:400,total:488},2024:{prof:228,culture:395,total:482},2023:{prof:225,culture:390,total:476}}},
-    {id:5,name:"河南科技大学",city:"洛阳",region:"河南省内",type:"公办",batch:"本科A段",
+     scores:{2025:{prof:230,culture:400,total:488,rank:8869},2024:{prof:228,culture:395,total:482,rank:17771},2023:{prof:225,culture:390,total:476,rank:21146}}},
+    {id:5,name:"河南科技大学",
+     schoolCode:"6085",city:"洛阳",region:"河南省内",type:"公办",batch:"本科A段",
      majors:["产品设计","动画"],planCount:70,tuition:"8000元/年",
      desc:"省属重点大学",tags:["公办"],
-     scores:{2025:{prof:228,culture:395,total:482},2024:{prof:225,culture:390,total:476},2023:{prof:222,culture:385,total:470}}},
-    {id:6,name:"河南工业大学",city:"郑州",region:"河南省内",type:"公办",batch:"本科A段",
+     scores:{2025:{prof:228,culture:395,total:482,rank:12218},2024:{prof:225,culture:390,total:476,rank:17771},2023:{prof:222,culture:385,total:470,rank:25865}}},
+    {id:6,name:"河南工业大学",
+     schoolCode:"6105",city:"郑州",region:"河南省内",type:"公办",batch:"本科A段",
      majors:["环境设计","视觉传达设计"],planCount:55,tuition:"8000元/年",
      desc:"省属重点大学",tags:["公办"],
-     scores:{2025:{prof:226,culture:393,total:478},2024:{prof:224,culture:388,total:473},2023:{prof:220,culture:382,total:465}}},
-    {id:7,name:"中原工学院",city:"郑州",region:"河南省内",type:"公办",batch:"本科A段",
+     scores:{2025:{prof:226,culture:393,total:478,rank:12218},2024:{prof:224,culture:388,total:473,rank:21412},2023:{prof:220,culture:382,total:465,rank:25865}}},
+    {id:7,name:"中原工学院",
+     schoolCode:"6115",city:"郑州",region:"河南省内",type:"公办",batch:"本科A段",
      majors:["服装与服饰设计","视觉传达设计"],planCount:100,tuition:"8000元/年",
      desc:"服装设计特色院校",tags:["公办"],
-     scores:{2025:{prof:220,culture:383,total:468},2024:{prof:218,culture:378,total:462},2023:{prof:215,culture:372,total:455}}},
-    {id:8,name:"郑州轻工业大学",city:"郑州",region:"河南省内",type:"公办",batch:"本科A段",
+     scores:{2025:{prof:220,culture:383,total:468,rank:16099},2024:{prof:218,culture:378,total:462,rank:27509},2023:{prof:215,culture:372,total:455,rank:32601}}},
+    {id:8,name:"郑州轻工业大学",
+     schoolCode:"6110",city:"郑州",region:"河南省内",type:"公办",batch:"本科A段",
      majors:["产品设计","数字媒体艺术","绘画"],planCount:130,tuition:"8000元/年",
      desc:"设计学科特色鲜明",tags:["公办"],
-     scores:{2025:{prof:223,culture:387,total:472},2024:{prof:220,culture:382,total:465},2023:{prof:218,culture:375,total:458}}},
-    {id:9,name:"信阳师范大学",city:"信阳",region:"河南省内",type:"公办",batch:"本科A段",
+     scores:{2025:{prof:223,culture:387,total:472,rank:16099},2024:{prof:220,culture:382,total:465,rank:21412},2023:{prof:218,culture:375,total:458,rank:32601}}},
+    {id:9,name:"信阳师范大学",
+     schoolCode:"6065",city:"信阳",region:"河南省内",type:"公办",batch:"本科A段",
      majors:["美术学","视觉传达设计"],planCount:80,tuition:"8000元/年",
      desc:"豫南地区重点师范院校",tags:["公办"],
-     scores:{2025:{prof:213,culture:373,total:452},2024:{prof:210,culture:368,total:446},2023:{prof:208,culture:362,total:440}}},
-    {id:10,name:"洛阳师范学院",city:"洛阳",region:"河南省内",type:"公办",batch:"本科A段",
+     scores:{2025:{prof:213,culture:373,total:452,rank:25717},2024:{prof:210,culture:368,total:446,rank:31809},2023:{prof:208,culture:362,total:440,rank:44554}}},
+    {id:10,name:"洛阳师范学院",
+     schoolCode:"6035",city:"洛阳",region:"河南省内",type:"公办",batch:"本科A段",
      majors:["美术学","动画","视觉传达设计"],planCount:90,tuition:"8000元/年",
      desc:"师范教育底蕴深厚",tags:["公办"],
-     scores:{2025:{prof:208,culture:367,total:442},2024:{prof:205,culture:362,total:436},2023:{prof:202,culture:355,total:428}}},
-    {id:11,name:"安阳师范学院",city:"安阳",region:"河南省内",type:"公办",batch:"本科A段",
+     scores:{2025:{prof:208,culture:367,total:442,rank:31529},2024:{prof:205,culture:362,total:436,rank:38259},2023:{prof:202,culture:355,total:428,rank:49447}}},
+    {id:11,name:"安阳师范学院",
+     schoolCode:"6050",city:"安阳",region:"河南省内",type:"公办",batch:"本科A段",
      majors:["美术学","环境设计"],planCount:75,tuition:"8000元/年",
      desc:"甲骨文特色院校",tags:["公办"],
-     scores:{2025:{prof:203,culture:360,total:432},2024:{prof:200,culture:355,total:426},2023:{prof:198,culture:348,total:419}}},
-    {id:12,name:"南阳师范学院",city:"南阳",region:"河南省内",type:"公办",batch:"本科A段",
+     scores:{2025:{prof:203,culture:360,total:432,rank:36446},2024:{prof:200,culture:355,total:426,rank:42939},2023:{prof:198,culture:348,total:419,rank:55298}}},
+    {id:12,name:"南阳师范学院",
+     schoolCode:"6070",city:"南阳",region:"河南省内",type:"公办",batch:"本科A段",
      majors:["美术学","视觉传达设计"],planCount:70,tuition:"8000元/年",
      desc:"豫西南地区综合性师范院校",tags:["公办"],
-     scores:{2025:{prof:198,culture:353,total:422},2024:{prof:195,culture:348,total:416},2023:{prof:192,culture:340,total:408}}},
-    {id:13,name:"商丘师范学院",city:"商丘",region:"河南省内",type:"公办",batch:"本科A段",
+     scores:{2025:{prof:198,culture:353,total:422,rank:41899},2024:{prof:195,culture:348,total:416,rank:48968},2023:{prof:192,culture:340,total:408,rank:59009}}},
+    {id:13,name:"商丘师范学院",
+     schoolCode:"6055",city:"商丘",region:"河南省内",type:"公办",batch:"本科A段",
      majors:["绘画","视觉传达设计"],planCount:65,tuition:"8000元/年",
      desc:"省属公办本科院校",tags:["公办"],
-     scores:{2025:{prof:196,culture:350,total:418},2024:{prof:193,culture:345,total:412},2023:{prof:190,culture:338,total:405}}},
-    {id:14,name:"周口师范学院",city:"周口",region:"河南省内",type:"公办",batch:"本科A段",
+     scores:{2025:{prof:196,culture:350,total:418,rank:41899},2024:{prof:193,culture:345,total:412,rank:53291},2023:{prof:190,culture:338,total:405,rank:59009}}},
+    {id:14,name:"周口师范学院",
+     schoolCode:"6060",city:"周口",region:"河南省内",type:"公办",batch:"本科A段",
      majors:["美术学","视觉传达设计"],planCount:60,tuition:"8000元/年",
      desc:"豫东地区师范院校",tags:["公办"],
-     scores:{2025:{prof:193,culture:345,total:412},2024:{prof:190,culture:340,total:406},2023:{prof:188,culture:335,total:400}}},
-    {id:15,name:"许昌学院",city:"许昌",region:"河南省内",type:"公办",batch:"本科A段",
+     scores:{2025:{prof:193,culture:345,total:412,rank:46114},2024:{prof:190,culture:340,total:406,rank:53291},2023:{prof:188,culture:335,total:400,rank:62484}}},
+    {id:15,name:"许昌学院",
+     schoolCode:"6040",city:"许昌",region:"河南省内",type:"公办",batch:"本科A段",
      majors:["美术学","环境设计"],planCount:55,tuition:"8000元/年",
      desc:"地方性应用型本科院校",tags:["公办"],
-     scores:{2025:{prof:190,culture:340,total:406},2024:{prof:188,culture:335,total:400},2023:{prof:185,culture:330,total:395}}},
-    {id:16,name:"郑州工商学院",city:"郑州",region:"河南省内",type:"民办",batch:"本科B段",
+     scores:{2025:{prof:190,culture:340,total:406,rank:46114},2024:{prof:188,culture:335,total:400,rank:57253},2023:{prof:185,culture:330,total:395,rank:62484}}},
+    {id:16,name:"郑州工商学院",
+     schoolCode:"6506",city:"郑州",region:"河南省内",type:"民办",batch:"本科B段",
      majors:["视觉传达设计","环境设计"],planCount:150,tuition:"18000元/年",
      desc:"民办本科，招生计划充足",tags:["民办"],
-     scores:{2025:{prof:173,culture:315,total:372},2024:{prof:170,culture:310,total:365},2023:{prof:168,culture:305,total:358}}},
-    {id:17,name:"郑州科技学院",city:"郑州",region:"河南省内",type:"民办",batch:"本科B段",
+     scores:{2025:{prof:173,culture:315,total:372,rank:53643},2024:{prof:170,culture:310,total:365,rank:59327},2023:{prof:168,culture:305,total:358,rank:63759}}},
+    {id:17,name:"郑州科技学院",
+     schoolCode:"6180",city:"郑州",region:"河南省内",type:"民办",batch:"本科B段",
      majors:["视觉传达设计","动画","环境设计"],planCount:180,tuition:"17000元/年",
      desc:"应用型民办本科",tags:["民办"],
-     scores:{2025:{prof:176,culture:320,total:378},2024:{prof:173,culture:315,total:371},2023:{prof:170,culture:308,total:363}}},
-    {id:18,name:"郑州升达经贸管理学院",city:"郑州",region:"河南省内",type:"民办",batch:"本科B段",
+     scores:{2025:{prof:176,culture:320,total:378,rank:53643},2024:{prof:173,culture:315,total:371,rank:59327},2023:{prof:170,culture:308,total:363,rank:63759}}},
+    {id:18,name:"郑州升达经贸管理学院",
+     schoolCode:"6195",city:"郑州",region:"河南省内",type:"民办",batch:"本科B段",
      majors:["视觉传达设计","环境设计","数字媒体艺术"],planCount:120,tuition:"17000元/年",
      desc:"经管类民办本科",tags:["民办"],
-     scores:{2025:{prof:171,culture:313,total:369},2024:{prof:168,culture:308,total:362},2023:{prof:165,culture:300,total:353}}},
-    {id:19,name:"黄河科技学院",city:"郑州",region:"河南省内",type:"民办",batch:"本科B段",
+     scores:{2025:{prof:171,culture:313,total:369,rank:53643},2024:{prof:168,culture:308,total:362,rank:59327},2023:{prof:165,culture:300,total:353,rank:63759}}},
+    {id:19,name:"黄河科技学院",
+     schoolCode:"6130",city:"郑州",region:"河南省内",type:"民办",batch:"本科B段",
      majors:["视觉传达设计","动画"],planCount:110,tuition:"16500元/年",
      desc:"民办本科院校",tags:["民办"],
-     scores:{2025:{prof:168,culture:310,total:364},2024:{prof:165,culture:305,total:357},2023:{prof:162,culture:298,total:350}}},
-    {id:20,name:"郑州商学院",city:"巩义",region:"河南省内",type:"民办",batch:"本科B段",
+     scores:{2025:{prof:168,culture:310,total:364,rank:53643},2024:{prof:165,culture:305,total:357,rank:59327},2023:{prof:162,culture:298,total:350,rank:63759}}},
+    {id:20,name:"郑州商学院",
+     schoolCode:"6510",city:"巩义",region:"河南省内",type:"民办",batch:"本科B段",
      majors:["视觉传达设计","环境设计"],planCount:100,tuition:"16500元/年",
      desc:"商科特色民办本科",tags:["民办"],
-     scores:{2025:{prof:166,culture:307,total:360},2024:{prof:163,culture:302,total:354},2023:{prof:160,culture:295,total:345}}},
-    {id:21,name:"中原科技学院",city:"郑州",region:"河南省内",type:"民办",batch:"本科B段",
+     scores:{2025:{prof:166,culture:307,total:360,rank:53643},2024:{prof:163,culture:302,total:354,rank:59327},2023:{prof:160,culture:295,total:345,rank:63759}}},
+    {id:21,name:"中原科技学院",
+     schoolCode:"6502",city:"郑州",region:"河南省内",type:"民办",batch:"本科B段",
      majors:["视觉传达设计","产品设计"],planCount:80,tuition:"16000元/年",
      desc:"民办本科院校",tags:["民办"],
-     scores:{2025:{prof:163,culture:303,total:356},2024:{prof:160,culture:298,total:350},2023:{prof:158,culture:290,total:342}}},
-    {id:22,name:"新乡工程学院",city:"新乡",region:"河南省内",type:"民办",batch:"本科B段",
+     scores:{2025:{prof:163,culture:303,total:356,rank:53643},2024:{prof:160,culture:298,total:350,rank:59327},2023:{prof:158,culture:290,total:342,rank:63759}}},
+    {id:22,name:"新乡工程学院",
+     schoolCode:"6503",city:"新乡",region:"河南省内",type:"民办",batch:"本科B段",
      majors:["视觉传达设计","环境设计"],planCount:90,tuition:"16000元/年",
      desc:"民办本科院校",tags:["民办"],
-     scores:{2025:{prof:160,culture:300,total:350},2024:{prof:158,culture:295,total:345},2023:{prof:155,culture:288,total:338}}},
-    {id:23,name:"河南工程学院",city:"郑州",region:"河南省内",type:"公办",batch:"本科A段",
+     scores:{2025:{prof:160,culture:300,total:350,rank:53643},2024:{prof:158,culture:295,total:345,rank:59327},2023:{prof:155,culture:288,total:338,rank:63759}}},
+    {id:23,name:"河南工程学院",
+     schoolCode:"6155",city:"郑州",region:"河南省内",type:"公办",batch:"本科A段",
      majors:["视觉传达设计","环境设计","产品设计"],planCount:85,tuition:"8000元/年",
      desc:"工科为主，设计学科并重",tags:["公办"],
-     scores:{2025:{prof:208,culture:365,total:442},2024:{prof:205,culture:360,total:436},2023:{prof:202,culture:352,total:428}}},
-    {id:24,name:"洛阳理工学院",city:"洛阳",region:"河南省内",type:"公办",batch:"本科A段",
+     scores:{2025:{prof:208,culture:365,total:442,rank:31529},2024:{prof:205,culture:360,total:436,rank:38259},2023:{prof:202,culture:352,total:428,rank:49447}}},
+    {id:24,name:"洛阳理工学院",
+     schoolCode:"6160",city:"洛阳",region:"河南省内",type:"公办",batch:"本科A段",
      majors:["环境设计","视觉传达设计"],planCount:60,tuition:"8000元/年",
      desc:"省属公办本科",tags:["公办"],
-     scores:{2025:{prof:206,culture:363,total:436},2024:{prof:203,culture:358,total:430},2023:{prof:200,culture:350,total:422}}},
-    {id:25,name:"河南财政金融学院",city:"郑州",region:"河南省内",type:"公办",batch:"本科A段",
+     scores:{2025:{prof:206,culture:363,total:436,rank:31529},2024:{prof:203,culture:358,total:430,rank:42939},2023:{prof:200,culture:350,total:422,rank:49447}}},
+    {id:25,name:"河南财政金融学院",
+     schoolCode:"6215",city:"郑州",region:"河南省内",type:"公办",batch:"本科A段",
      majors:["视觉传达设计","环境设计"],planCount:50,tuition:"8000元/年",
      desc:"财经类特色公办院校",tags:["公办"],
-     scores:{2025:{prof:203,culture:357,total:432},2024:{prof:200,culture:352,total:426},2023:{prof:198,culture:345,total:419}}},
-    {id:26,name:"平顶山学院",city:"平顶山",region:"河南省内",type:"公办",batch:"本科A段",
+     scores:{2025:{prof:203,culture:357,total:432,rank:36446},2024:{prof:200,culture:352,total:426,rank:42939},2023:{prof:198,culture:345,total:419,rank:55298}}},
+    {id:26,name:"平顶山学院",
+     schoolCode:"6125",city:"平顶山",region:"河南省内",type:"公办",batch:"本科A段",
      majors:["美术学","视觉传达设计"],planCount:70,tuition:"8000元/年",
      desc:"地方性本科院校",tags:["公办"],
-     scores:{2025:{prof:188,culture:335,total:398},2024:{prof:185,culture:330,total:392},2023:{prof:182,culture:325,total:385}}},
-    {id:27,name:"黄淮学院",city:"驻马店",region:"河南省内",type:"公办",batch:"本科A段",
+     scores:{2025:{prof:188,culture:335,total:398,rank:49918},2024:{prof:185,culture:330,total:392,rank:57253},2023:{prof:182,culture:325,total:385,rank:63759}}},
+    {id:27,name:"黄淮学院",
+     schoolCode:"6150",city:"驻马店",region:"河南省内",type:"公办",batch:"本科A段",
      majors:["美术学","环境设计","视觉传达设计"],planCount:80,tuition:"8000元/年",
      desc:"地方性应用型本科",tags:["公办"],
-     scores:{2025:{prof:186,culture:333,total:396},2024:{prof:183,culture:328,total:390},2023:{prof:180,culture:320,total:382}}},
-    {id:28,name:"新乡学院",city:"新乡",region:"河南省内",type:"公办",batch:"本科A段",
+     scores:{2025:{prof:186,culture:333,total:396,rank:49918},2024:{prof:183,culture:328,total:390,rank:59327},2023:{prof:180,culture:320,total:382,rank:63759}}},
+    {id:28,name:"新乡学院",
+     schoolCode:"6165",city:"新乡",region:"河南省内",type:"公办",batch:"本科A段",
      majors:["视觉传达设计","环境设计"],planCount:65,tuition:"8000元/年",
      desc:"地方性本科院校",tags:["公办"],
-     scores:{2025:{prof:183,culture:330,total:392},2024:{prof:180,culture:325,total:386},2023:{prof:178,culture:318,total:378}}},
-    {id:29,name:"河南城建学院",city:"平顶山",region:"河南省内",type:"公办",batch:"本科A段",
+     scores:{2025:{prof:183,culture:330,total:392,rank:52038},2024:{prof:180,culture:325,total:386,rank:59327},2023:{prof:178,culture:318,total:378,rank:63759}}},
+    {id:29,name:"河南城建学院",
+     schoolCode:"6120",city:"平顶山",region:"河南省内",type:"公办",batch:"本科A段",
      majors:["环境设计","视觉传达设计"],planCount:60,tuition:"8000元/年",
      desc:"城建特色本科院校",tags:["公办"],
-     scores:{2025:{prof:181,culture:327,total:389},2024:{prof:178,culture:322,total:382},2023:{prof:175,culture:315,total:375}}},
-    {id:30,name:"安阳工学院",city:"安阳",region:"河南省内",type:"公办",batch:"本科A段",
+     scores:{2025:{prof:181,culture:327,total:389,rank:52038},2024:{prof:178,culture:322,total:382,rank:59327},2023:{prof:175,culture:315,total:375,rank:63759}}},
+    {id:30,name:"安阳工学院",
+     schoolCode:"6135",city:"安阳",region:"河南省内",type:"公办",batch:"本科A段",
      majors:["视觉传达设计","环境设计","产品设计"],planCount:75,tuition:"8000元/年",
      desc:"工科特色地方院校",tags:["公办"],
-     scores:{2025:{prof:180,culture:325,total:386},2024:{prof:178,culture:320,total:380},2023:{prof:175,culture:313,total:372}}},
-    {id:31,name:"中央美术学院",city:"北京",region:"京津地区",type:"公办",level:"双一流",batch:"提前批",
+     scores:{2025:{prof:180,culture:325,total:386,rank:52038},2024:{prof:178,culture:320,total:380,rank:59327},2023:{prof:175,culture:313,total:372,rank:63759}}},
+    {id:31,name:"中央美术学院",
+     schoolCode:"9902",city:"北京",region:"京津地区",type:"公办",level:"双一流",batch:"提前批",
      majors:["中国画","造型艺术","设计学类"],planCount:20,tuition:"15000元/年",
      desc:"中国美术最高学府，教育部直属",tags:["公办","双一流","美院"],
-     scores:{2025:{prof:272,culture:475,total:578},2024:{prof:270,culture:470,total:572},2023:{prof:268,culture:465,total:565}}},
-    {id:32,name:"中国美术学院",city:"杭州",region:"华东地区",type:"公办",level:"双一流",batch:"提前批",
+     scores:{2025:{prof:272,culture:475,total:578,rank:324},2024:{prof:270,culture:470,total:572,rank:488},2023:{prof:268,culture:465,total:565,rank:857}}},
+    {id:32,name:"中国美术学院",
+     schoolCode:"9925",city:"杭州",region:"华东地区",type:"公办",level:"双一流",batch:"提前批",
      majors:["中国画","书法学","设计学类"],planCount:18,tuition:"15000元/年",
      desc:"世界一流美术学院",tags:["公办","双一流","美院"],
-     scores:{2025:{prof:270,culture:470,total:572},2024:{prof:268,culture:465,total:565},2023:{prof:265,culture:458,total:558}}},
-    {id:33,name:"四川美术学院",city:"重庆",region:"西南地区",type:"公办",batch:"提前批",
+     scores:{2025:{prof:270,culture:470,total:572,rank:324},2024:{prof:268,culture:465,total:565,rank:927},2023:{prof:265,culture:458,total:558,rank:857}}},
+    {id:33,name:"四川美术学院",
+     schoolCode:"9940",city:"重庆",region:"西南地区",type:"公办",batch:"提前批",
      majors:["绘画","雕塑","设计学类"],planCount:25,tuition:"15000元/年",
      desc:"西南地区重要美术学院",tags:["公办","美院"],
-     scores:{2025:{prof:262,culture:450,total:552},2024:{prof:260,culture:445,total:548},2023:{prof:258,culture:438,total:540}}},
-    {id:34,name:"天津美术学院",city:"天津",region:"京津地区",type:"公办",batch:"提前批",
+     scores:{2025:{prof:262,culture:450,total:552,rank:879},2024:{prof:260,culture:445,total:548,rank:1499},2023:{prof:258,culture:438,total:540,rank:2550}}},
+    {id:34,name:"天津美术学院",
+     schoolCode:"9910",city:"天津",region:"京津地区",type:"公办",batch:"提前批",
      majors:["绘画","雕塑","设计学类"],planCount:22,tuition:"15000元/年",
      desc:"北方重要美术学院",tags:["公办","美院"],
-     scores:{2025:{prof:260,culture:445,total:548},2024:{prof:258,culture:440,total:542},2023:{prof:255,culture:432,total:535}}},
-    {id:35,name:"厦门大学",city:"厦门",region:"华东地区",type:"公办",level:"985/211",batch:"本科A段",
+     scores:{2025:{prof:260,culture:445,total:548,rank:879},2024:{prof:258,culture:440,total:542,rank:2410},2023:{prof:255,culture:432,total:535,rank:2550}}},
+    {id:35,name:"厦门大学",
+     schoolCode:"1190",city:"厦门",region:"华东地区",type:"公办",level:"985/211",batch:"本科A段",
      majors:["视觉传达设计","环境设计","数字媒体艺术"],planCount:15,tuition:"9360元/年",
      desc:"985工程重点大学，南方之强",tags:["公办","985"],
-     scores:{2025:{prof:265,culture:460,total:562},2024:{prof:262,culture:455,total:556},2023:{prof:260,culture:448,total:548}}},
-    {id:36,name:"华东师范大学",city:"上海",region:"华东地区",type:"公办",level:"985/211",batch:"提前批",
+     scores:{2025:{prof:265,culture:460,total:562,rank:562},2024:{prof:262,culture:455,total:556,rank:1499},2023:{prof:260,culture:448,total:548,rank:1443}}},
+    {id:36,name:"华东师范大学",
+     schoolCode:"1410",city:"上海",region:"华东地区",type:"公办",level:"985/211",batch:"提前批",
      majors:["美术学","设计学类"],planCount:12,tuition:"10000元/年",
      desc:"教育部直属985高校",tags:["公办","985"],
-     scores:{2025:{prof:268,culture:465,total:568},2024:{prof:265,culture:458,total:560},2023:{prof:262,culture:450,total:552}}},
-    {id:37,name:"北京服装学院",city:"北京",region:"京津地区",type:"公办",batch:"提前批",
+     scores:{2025:{prof:268,culture:465,total:568,rank:562},2024:{prof:265,culture:458,total:560,rank:927},2023:{prof:262,culture:450,total:552,rank:1443}}},
+    {id:37,name:"北京服装学院",
+     schoolCode:"3150",city:"北京",region:"京津地区",type:"公办",batch:"提前批",
      majors:["服装与服饰设计","视觉传达设计","数字媒体艺术"],planCount:28,tuition:"10000元/年",
      desc:"国内服装设计领军院校",tags:["公办"],
-     scores:{2025:{prof:252,culture:435,total:532},2024:{prof:250,culture:430,total:528},2023:{prof:248,culture:422,total:520}}},
-    {id:38,name:"中国传媒大学",city:"北京",region:"京津地区",type:"公办",level:"211",batch:"提前批",
+     scores:{2025:{prof:252,culture:435,total:532,rank:2120},2024:{prof:250,culture:430,total:528,rank:3592},2023:{prof:248,culture:422,total:520,rank:5873}}},
+    {id:38,name:"中国传媒大学",
+     schoolCode:"1470",city:"北京",region:"京津地区",type:"公办",level:"211",batch:"提前批",
      majors:["数字媒体艺术","动画","视觉传达设计"],planCount:15,tuition:"10000元/年",
      desc:"传媒艺术领域顶尖211院校",tags:["公办","211"],
-     scores:{2025:{prof:258,culture:450,total:542},2024:{prof:255,culture:445,total:538},2023:{prof:252,culture:438,total:530}}},
-    {id:39,name:"景德镇陶瓷大学",city:"景德镇",region:"华东地区",type:"公办",batch:"本科A段",
+     scores:{2025:{prof:258,culture:450,total:542,rank:1418},2024:{prof:255,culture:445,total:538,rank:2410},2023:{prof:252,culture:438,total:530,rank:3753}}},
+    {id:39,name:"景德镇陶瓷大学",
+     schoolCode:"4280",city:"景德镇",region:"华东地区",type:"公办",batch:"本科A段",
      majors:["陶瓷艺术设计","雕塑","绘画"],planCount:40,tuition:"9600元/年",
      desc:"中国陶瓷艺术最高学府",tags:["公办"],
-     scores:{2025:{prof:228,culture:395,total:482},2024:{prof:225,culture:390,total:476},2023:{prof:222,culture:382,total:468}}},
-    {id:40,name:"山东工艺美术学院",city:"济南",region:"华东地区",type:"公办",batch:"本科A段",
+     scores:{2025:{prof:228,culture:395,total:482,rank:12218},2024:{prof:225,culture:390,total:476,rank:17771},2023:{prof:222,culture:382,total:468,rank:25865}}},
+    {id:40,name:"山东工艺美术学院",
+     schoolCode:"9547",city:"济南",region:"华东地区",type:"公办",batch:"本科A段",
      majors:["视觉传达设计","环境设计","产品设计","服装与服饰设计"],planCount:35,tuition:"10000元/年",
      desc:"知名工艺美术院校",tags:["公办"],
-     scores:{2025:{prof:238,culture:410,total:502},2024:{prof:235,culture:405,total:498},2023:{prof:232,culture:398,total:490}}},
-    {id:41,name:"武汉理工大学",city:"武汉",region:"华中地区",type:"公办",level:"211",batch:"本科A段",
+     scores:{2025:{prof:238,culture:410,total:502,rank:6476},2024:{prof:235,culture:405,total:498,rank:10235},2023:{prof:232,culture:398,total:490,rank:15300}}},
+    {id:41,name:"武汉理工大学",
+     schoolCode:"1315",city:"武汉",region:"华中地区",type:"公办",level:"211",batch:"本科A段",
      majors:["视觉传达设计","环境设计","产品设计"],planCount:20,tuition:"10350元/年",
      desc:"211工程重点大学，设计学科强势",tags:["公办","211"],
-     scores:{2025:{prof:245,culture:430,total:522},2024:{prof:242,culture:425,total:516},2023:{prof:240,culture:418,total:508}}},
-    {id:42,name:"湖北美术学院",city:"武汉",region:"华中地区",type:"公办",batch:"提前批",
+     scores:{2025:{prof:245,culture:430,total:522,rank:3111},2024:{prof:242,culture:425,total:516,rank:7179},2023:{prof:240,culture:418,total:508,rank:8092}}},
+    {id:42,name:"湖北美术学院",
+     schoolCode:"9930",city:"武汉",region:"华中地区",type:"公办",batch:"提前批",
      majors:["绘画","雕塑","设计学类"],planCount:30,tuition:"15000元/年",
      desc:"华中地区重要美院",tags:["公办","美院"],
-     scores:{2025:{prof:255,culture:440,total:536},2024:{prof:252,culture:435,total:530},2023:{prof:250,culture:428,total:522}}},
-    {id:43,name:"西安美术学院",city:"西安",region:"西北地区",type:"公办",batch:"提前批",
+     scores:{2025:{prof:255,culture:440,total:536,rank:1418},2024:{prof:252,culture:435,total:530,rank:3592},2023:{prof:250,culture:428,total:522,rank:3753}}},
+    {id:43,name:"西安美术学院",
+     schoolCode:"9948",city:"西安",region:"西北地区",type:"公办",batch:"提前批",
      majors:["中国画","绘画","设计学类"],planCount:25,tuition:"15000元/年",
      desc:"西北地区最高美术学府",tags:["公办","美院"],
-     scores:{2025:{prof:258,culture:443,total:542},2024:{prof:255,culture:438,total:536},2023:{prof:252,culture:430,total:528}}},
-    {id:44,name:"南京艺术学院",city:"南京",region:"华东地区",type:"公办",batch:"本科A段",
+     scores:{2025:{prof:258,culture:443,total:542,rank:1418},2024:{prof:255,culture:438,total:536,rank:2410},2023:{prof:252,culture:430,total:528,rank:3753}}},
+    {id:44,name:"南京艺术学院",
+     schoolCode:"9922",city:"南京",region:"华东地区",type:"公办",batch:"本科A段",
      majors:["绘画","视觉传达设计","环境设计"],planCount:22,tuition:"11000元/年",
      desc:"综合性艺术院校",tags:["公办"],
-     scores:{2025:{prof:248,culture:433,total:526},2024:{prof:245,culture:428,total:520},2023:{prof:242,culture:420,total:512}}},
-    {id:45,name:"浙江传媒学院",city:"杭州",region:"华东地区",type:"公办",batch:"本科A段",
+     scores:{2025:{prof:248,culture:433,total:526,rank:3111},2024:{prof:245,culture:428,total:520,rank:5341},2023:{prof:242,culture:420,total:512,rank:8092}}},
+    {id:45,name:"浙江传媒学院",
+     schoolCode:"3960",city:"杭州",region:"华东地区",type:"公办",batch:"本科A段",
      majors:["动画","数字媒体艺术","视觉传达设计"],planCount:25,tuition:"10300元/年",
      desc:"传媒艺术特色院校",tags:["公办"],
-     scores:{2025:{prof:240,culture:415,total:506},2024:{prof:238,culture:410,total:500},2023:{prof:235,culture:402,total:492}}},
+     scores:{2025:{prof:240,culture:415,total:506,rank:4502},2024:{prof:238,culture:410,total:500,rank:10235},2023:{prof:235,culture:402,total:492,rank:11716}}},
+
+    {id:46,name:"东北师范大学",
+     schoolCode:"1405",city:"长春",region:"东北地区",type:"公办",level:"211",batch:"提前批",
+   majors:["美术学","雕塑","设计学类"],planCount:18,tuition:"12000元/年",
+   desc:"教育部直属211师范大学，美术学实力强劲",tags:["公办","211"],
+   scores:{2025:{prof:250,culture:435,total:528,rank:2120},2024:{prof:248,culture:430,total:522,rank:5341},2023:{prof:245,culture:422,total:514,rank:5873}}},
+  {id:47,name:"华中师范大学",
+     schoolCode:"1415",city:"武汉",region:"华中地区",type:"公办",level:"211",batch:"提前批",
+   majors:["美术学","视觉传达设计","环境设计"],planCount:20,tuition:"10350元/年",
+   desc:"教育部直属211师范院校",tags:["公办","211"],
+   scores:{2025:{prof:248,culture:432,total:526,rank:3111},2024:{prof:245,culture:428,total:520,rank:5341},2023:{prof:242,culture:420,total:512,rank:8092}}},
+  {id:48,name:"陕西师范大学",
+     schoolCode:"1420",city:"西安",region:"西北地区",type:"公办",level:"211",batch:"提前批",
+   majors:["美术学","绘画","视觉传达设计"],planCount:16,tuition:"11000元/年",
+   desc:"教育部直属211师范大学，美术学国家特色专业",tags:["公办","211"],
+   scores:{2025:{prof:242,culture:425,total:518,rank:4502},2024:{prof:240,culture:420,total:512,rank:7179},2023:{prof:238,culture:412,total:505,rank:11716}}},
+  {id:49,name:"湖南师范大学",
+     schoolCode:"1935",city:"长沙",region:"华中地区",type:"公办",level:"211",batch:"本科A段",
+   majors:["美术学","绘画","艺术设计学"],planCount:22,tuition:"10000元/年",
+   desc:"211工程师范大学，美术学科实力雄厚",tags:["公办","211"],
+   scores:{2025:{prof:240,culture:420,total:512,rank:4502},2024:{prof:238,culture:415,total:506,rank:10235},2023:{prof:235,culture:408,total:498,rank:11716}}},
+  {id:50,name:"南京师范大学",
+     schoolCode:"1855",city:"南京",region:"华东地区",type:"公办",level:"211",batch:"本科A段",
+   majors:["美术学","绘画","视觉传达设计"],planCount:15,tuition:"11000元/年",
+   desc:"211师范大学，美术学国家一流专业",tags:["公办","211"],
+   scores:{2025:{prof:252,culture:438,total:530,rank:2120},2024:{prof:250,culture:432,total:524,rank:3592},2023:{prof:248,culture:425,total:515,rank:5873}}},
+  {id:51,name:"上海大学",
+     schoolCode:"1790",city:"上海",region:"华东地区",type:"公办",level:"211",batch:"本科A段",
+   majors:["绘画","视觉传达设计","环境设计","数字媒体艺术"],planCount:20,tuition:"10000元/年",
+   desc:"211工程综合性大学，上海美术学院实力强劲",tags:["公办","211"],
+   scores:{2025:{prof:255,culture:442,total:535,rank:1418},2024:{prof:252,culture:438,total:528,rank:3592},2023:{prof:250,culture:430,total:520,rank:3753}}},
+  {id:52,name:"苏州大学",
+     schoolCode:"1830",city:"苏州",region:"华东地区",type:"公办",level:"211",batch:"本科A段",
+   majors:["美术学","视觉传达设计","环境设计","产品设计"],planCount:18,tuition:"11000元/年",
+   desc:"211工程大学，设计学科实力突出",tags:["公办","211"],
+   scores:{2025:{prof:248,culture:430,total:520,rank:3111},2024:{prof:245,culture:425,total:514,rank:5341},2023:{prof:242,culture:418,total:505,rank:8092}}},
+  {id:53,name:"江南大学",
+     schoolCode:"1150",city:"无锡",region:"华东地区",type:"公办",level:"211",batch:"本科A段",
+   majors:["视觉传达设计","环境设计","产品设计","服装与服饰设计"],planCount:22,tuition:"11000元/年",
+   desc:"211工程大学，设计学科全国闻名",tags:["公办","211"],
+   scores:{2025:{prof:250,culture:435,total:528,rank:2120},2024:{prof:248,culture:430,total:522,rank:5341},2023:{prof:245,culture:422,total:514,rank:5873}}},
+  {id:54,name:"东华大学",
+     schoolCode:"10255",city:"上海",region:"华东地区",type:"公办",level:"211",batch:"提前批",
+   majors:["服装与服饰设计","视觉传达设计","环境设计","数字媒体艺术"],planCount:25,tuition:"10000元/年",
+   desc:"211工程大学，服装设计全国领先",tags:["公办","211"],
+   scores:{2025:{prof:258,culture:448,total:545,rank:1418},2024:{prof:255,culture:442,total:538,rank:2410},2023:{prof:252,culture:435,total:530,rank:3753}}},
+  {id:55,name:"北京印刷学院",
+     schoolCode:"3175",city:"北京",region:"京津地区",type:"公办",batch:"本科A段",
+   majors:["视觉传达设计","数字媒体艺术","绘画","动画"],planCount:20,tuition:"10000元/年",
+   desc:"印刷与设计特色院校，数字媒体领先",tags:["公办"],
+   scores:{2025:{prof:235,culture:405,total:498,rank:6476},2024:{prof:232,culture:400,total:492,rank:12829},2023:{prof:230,culture:392,total:485,rank:15300}}},
+  {id:56,name:"天津科技大学",
+     schoolCode:"3200",city:"天津",region:"京津地区",type:"公办",batch:"本科A段",
+   majors:["视觉传达设计","环境设计","产品设计"],planCount:25,tuition:"12000元/年",
+   desc:"工科为主，设计学科并重",tags:["公办"],
+   scores:{2025:{prof:225,culture:395,total:488,rank:12218},2024:{prof:222,culture:390,total:482,rank:21412},2023:{prof:220,culture:382,total:475,rank:25865}}},
+  {id:57,name:"河北工业大学",
+     schoolCode:"1630",city:"天津",region:"京津地区",type:"公办",level:"211",batch:"本科A段",
+   majors:["视觉传达设计","环境设计"],planCount:15,tuition:"11000元/年",
+   desc:"211工程大学，位于天津",tags:["公办","211"],
+   scores:{2025:{prof:240,culture:415,total:505,rank:4502},2024:{prof:238,culture:410,total:498,rank:10235},2023:{prof:235,culture:402,total:490,rank:11716}}},
+  {id:58,name:"山西大学",
+     schoolCode:"1660",city:"太原",region:"西北地区",type:"公办",level:"双一流",batch:"本科A段",
+   majors:["美术学","绘画","视觉传达设计","环境设计"],planCount:30,tuition:"10000元/年",
+   desc:"双一流建设高校，百年名校",tags:["公办","双一流"],
+   scores:{2025:{prof:230,culture:400,total:488,rank:8869},2024:{prof:228,culture:395,total:482,rank:17771},2023:{prof:225,culture:388,total:475,rank:21146}}},
+  {id:59,name:"太原理工大学",
+     schoolCode:"2365",city:"太原",region:"西北地区",type:"公办",level:"211",batch:"本科A段",
+   majors:["视觉传达设计","环境设计","绘画"],planCount:20,tuition:"10000元/年",
+   desc:"211工程大学，山西唯一211",tags:["公办","211"],
+   scores:{2025:{prof:235,culture:408,total:498,rank:6476},2024:{prof:232,culture:402,total:492,rank:12829},2023:{prof:230,culture:395,total:485,rank:15300}}},
+  {id:60,name:"安徽大学",
+     schoolCode:"1885",city:"合肥",region:"华东地区",type:"公办",level:"211",batch:"本科A段",
+   majors:["视觉传达设计","环境设计","绘画"],planCount:18,tuition:"10000元/年",
+   desc:"211工程综合性大学",tags:["公办","211"],
+   scores:{2025:{prof:238,culture:412,total:504,rank:6476},2024:{prof:235,culture:408,total:496,rank:10235},2023:{prof:232,culture:400,total:488,rank:15300}}},
+  {id:61,name:"福州大学",
+     schoolCode:"1895",city:"福州",region:"华东地区",type:"公办",level:"211",batch:"本科A段",
+   majors:["视觉传达设计","环境设计","产品设计","服装与服饰设计"],planCount:22,tuition:"10000元/年",
+   desc:"211工程大学，厦门工艺美术学院",tags:["公办","211"],
+   scores:{2025:{prof:242,culture:418,total:510,rank:4502},2024:{prof:240,culture:412,total:504,rank:7179},2023:{prof:238,culture:405,total:496,rank:11716}}},
+  {id:62,name:"南昌大学",
+     schoolCode:"1910",city:"南昌",region:"华东地区",type:"公办",level:"211",batch:"本科A段",
+   majors:["绘画","视觉传达设计","环境设计","产品设计"],planCount:25,tuition:"10000元/年",
+   desc:"211工程综合性大学，设计学科齐全",tags:["公办","211"],
+   scores:{2025:{prof:235,culture:408,total:496,rank:6476},2024:{prof:232,culture:402,total:490,rank:12829},2023:{prof:230,culture:395,total:482,rank:15300}}},
+  {id:63,name:"山东大学",
+     schoolCode:"1170",city:"济南",region:"华东地区",type:"公办",level:"985/211",batch:"本科A段",
+   majors:["美术学","视觉传达设计"],planCount:12,tuition:"10000元/年",
+   desc:"985工程重点大学",tags:["公办","985"],
+   scores:{2025:{prof:260,culture:450,total:548,rank:879},2024:{prof:258,culture:445,total:542,rank:2410},2023:{prof:255,culture:438,total:534,rank:2550}}},
+  {id:64,name:"中国地质大学（武汉）",
+     schoolCode:"1335",city:"武汉",region:"华中地区",type:"公办",level:"211",batch:"本科A段",
+   majors:["视觉传达设计","环境设计","数字媒体艺术"],planCount:20,tuition:"10350元/年",
+   desc:"211工程大学，珠宝设计为特色",tags:["公办","211"],
+   scores:{2025:{prof:242,culture:420,total:510,rank:4502},2024:{prof:240,culture:415,total:504,rank:7179},2023:{prof:238,culture:408,total:498,rank:11716}}},
+  {id:65,name:"中南财经政法大学",
+     schoolCode:"1205",city:"武汉",region:"华中地区",type:"公办",level:"211",batch:"本科A段",
+   majors:["视觉传达设计","动画","数字媒体艺术"],planCount:15,tuition:"10350元/年",
+   desc:"211工程财经政法特色大学",tags:["公办","211"],
+   scores:{2025:{prof:238,culture:415,total:505,rank:6476},2024:{prof:235,culture:410,total:498,rank:10235},2023:{prof:232,culture:402,total:490,rank:15300}}},
+  {id:66,name:"西南大学",
+     schoolCode:"1425",city:"重庆",region:"西南地区",type:"公办",level:"211",batch:"本科A段",
+   majors:["美术学","绘画","视觉传达设计"],planCount:25,tuition:"10000元/年",
+   desc:"211工程综合性大学，师范与艺术并重",tags:["公办","211"],
+   scores:{2025:{prof:240,culture:418,total:508,rank:4502},2024:{prof:238,culture:412,total:502,rank:10235},2023:{prof:235,culture:405,total:494,rank:11716}}},
+  {id:67,name:"四川大学",
+     schoolCode:"1175",city:"成都",region:"西南地区",type:"公办",level:"985/211",batch:"本科A段",
+   majors:["绘画","视觉传达设计","环境设计"],planCount:15,tuition:"10000元/年",
+   desc:"985工程重点大学，西南最高学府",tags:["公办","985"],
+   scores:{2025:{prof:258,culture:448,total:545,rank:1418},2024:{prof:255,culture:442,total:538,rank:2410},2023:{prof:252,culture:435,total:530,rank:3753}}},
+  {id:68,name:"重庆大学",
+     schoolCode:"2090",city:"重庆",region:"西南地区",type:"公办",level:"985/211",batch:"本科A段",
+   majors:["绘画","视觉传达设计","环境设计","产品设计"],planCount:18,tuition:"10000元/年",
+   desc:"985工程重点大学，设计学科强势",tags:["公办","985"],
+   scores:{2025:{prof:255,culture:442,total:538,rank:1418},2024:{prof:252,culture:438,total:532,rank:3592},2023:{prof:250,culture:430,total:525,rank:3753}}},
+  {id:69,name:"西南交通大学",
+     schoolCode:"1325",city:"成都",region:"西南地区",type:"公办",level:"211",batch:"本科A段",
+   majors:["视觉传达设计","环境设计","产品设计"],planCount:20,tuition:"10000元/年",
+   desc:"211工程大学，交通设计特色",tags:["公办","211"],
+   scores:{2025:{prof:232,culture:405,total:492,rank:8869},2024:{prof:230,culture:400,total:486,rank:12829},2023:{prof:228,culture:392,total:478,rank:21146}}},
+  {id:70,name:"长安大学",
+     schoolCode:"6989",city:"西安",region:"西北地区",type:"公办",level:"211",batch:"本科A段",
+   majors:["环境设计","视觉传达设计"],planCount:15,tuition:"11000元/年",
+   desc:"211工程大学，工科为主",tags:["公办","211"],
+   scores:{2025:{prof:228,culture:398,total:486,rank:12218},2024:{prof:225,culture:392,total:480,rank:17771},2023:{prof:222,culture:385,total:472,rank:25865}}},
+  {id:71,name:"西北农林科技大学",
+     schoolCode:"1370",city:"杨凌",region:"西北地区",type:"公办",level:"985/211",batch:"本科A段",
+   majors:["环境设计","视觉传达设计"],planCount:12,tuition:"10000元/年",
+   desc:"985工程重点大学，农林特色",tags:["公办","985"],
+   scores:{2025:{prof:225,culture:395,total:482,rank:12218},2024:{prof:222,culture:390,total:476,rank:21412},2023:{prof:220,culture:382,total:468,rank:25865}}},
+  {id:72,name:"陕西科技大学",
+     schoolCode:"2095",city:"西安",region:"西北地区",type:"公办",batch:"本科A段",
+   majors:["视觉传达设计","环境设计","产品设计","动画"],planCount:30,tuition:"10000元/年",
+   desc:"轻工与设计特色院校",tags:["公办"],
+   scores:{2025:{prof:218,culture:385,total:472,rank:21044},2024:{prof:215,culture:380,total:466,rank:27509},2023:{prof:212,culture:372,total:458,rank:37700}}},
+  {id:73,name:"西安建筑科技大学",
+     schoolCode:"2100",city:"西安",region:"西北地区",type:"公办",batch:"本科A段",
+   majors:["环境设计","视觉传达设计","产品设计"],planCount:25,tuition:"10000元/年",
+   desc:"建筑类特色院校，环境设计实力强",tags:["公办"],
+   scores:{2025:{prof:220,culture:388,total:475,rank:16099},2024:{prof:218,culture:382,total:468,rank:27509},2023:{prof:215,culture:375,total:460,rank:32601}}},
+  {id:74,name:"西北大学",
+     schoolCode:"10697",city:"西安",region:"西北地区",type:"公办",level:"211",batch:"本科A段",
+   majors:["美术学","视觉传达设计","环境设计","动画"],planCount:22,tuition:"10000元/年",
+   desc:"211工程综合性大学，艺术底蕴深厚",tags:["公办","211"],
+   scores:{2025:{prof:238,culture:412,total:502,rank:6476},2024:{prof:235,culture:408,total:496,rank:10235},2023:{prof:232,culture:400,total:488,rank:15300}}},
+  {id:75,name:"广州美术学院",
+     schoolCode:"9935",city:"广州",region:"华南地区",type:"公办",batch:"提前批",
+   majors:["绘画","雕塑","视觉传达设计","环境设计","产品设计"],planCount:28,tuition:"15000元/年",
+   desc:"华南地区最高美术学府",tags:["公办","美院"],
+   scores:{2025:{prof:265,culture:452,total:558,rank:562},2024:{prof:262,culture:448,total:552,rank:1499},2023:{prof:260,culture:440,total:545,rank:1443}}},
+  {id:76,name:"华南师范大学",
+     schoolCode:"1985",city:"广州",region:"华南地区",type:"公办",level:"211",batch:"本科A段",
+   majors:["美术学","视觉传达设计","环境设计","数字媒体艺术"],planCount:20,tuition:"10000元/年",
+   desc:"211师范大学，美术教育突出",tags:["公办","211"],
+   scores:{2025:{prof:242,culture:422,total:510,rank:4502},2024:{prof:240,culture:418,total:504,rank:7179},2023:{prof:238,culture:410,total:496,rank:11716}}},
+  {id:77,name:"深圳大学",
+     schoolCode:"1965",city:"深圳",region:"华南地区",type:"公办",batch:"本科A段",
+   majors:["视觉传达设计","环境设计","产品设计","数字媒体艺术"],planCount:25,tuition:"10000元/年",
+   desc:"深圳市属综合性大学，设计学科发展迅猛",tags:["公办"],
+   scores:{2025:{prof:245,culture:428,total:515,rank:3111},2024:{prof:242,culture:422,total:508,rank:7179},2023:{prof:240,culture:415,total:500,rank:8092}}},
+  {id:78,name:"广东工业大学",
+     schoolCode:"2930",city:"广州",region:"华南地区",type:"公办",batch:"本科A段",
+   majors:["视觉传达设计","环境设计","产品设计","服装与服饰设计","数字媒体艺术"],planCount:35,tuition:"10000元/年",
+   desc:"工科为主，设计学科齐全",tags:["公办"],
+   scores:{2025:{prof:228,culture:398,total:485,rank:12218},2024:{prof:225,culture:392,total:478,rank:17771},2023:{prof:222,culture:385,total:470,rank:25865}}},
+  {id:79,name:"广西艺术学院",
+     schoolCode:"9938",city:"南宁",region:"华南地区",type:"公办",batch:"本科A段",
+   majors:["绘画","雕塑","视觉传达设计","环境设计","产品设计","服装与服饰设计"],planCount:45,tuition:"12000元/年",
+   desc:"省属综合性艺术院校",tags:["公办"],
+   scores:{2025:{prof:225,culture:390,total:480,rank:12218},2024:{prof:222,culture:385,total:474,rank:21412},2023:{prof:220,culture:378,total:466,rank:25865}}},
+  {id:80,name:"云南艺术学院",
+     schoolCode:"9945",city:"昆明",region:"西南地区",type:"公办",batch:"本科A段",
+   majors:["绘画","雕塑","视觉传达设计","环境设计","产品设计"],planCount:40,tuition:"12000元/年",
+   desc:"西南地区重要综合性艺术院校",tags:["公办"],
+   scores:{2025:{prof:222,culture:388,total:478,rank:16099},2024:{prof:220,culture:382,total:472,rank:21412},2023:{prof:218,culture:375,total:465,rank:32601}}},
+  {id:81,name:"四川音乐学院",
+     schoolCode:"9941",city:"成都",region:"西南地区",type:"公办",batch:"本科A段",
+   majors:["绘画","雕塑","视觉传达设计","环境设计","数字媒体艺术"],planCount:30,tuition:"12000元/年",
+   desc:"知名艺术院校，美术设计并重",tags:["公办"],
+   scores:{2025:{prof:230,culture:398,total:488,rank:8869},2024:{prof:228,culture:392,total:482,rank:17771},2023:{prof:225,culture:385,total:475,rank:21146}}},
+  {id:82,name:"鲁迅美术学院",
+     schoolCode:"9915",city:"沈阳",region:"东北地区",type:"公办",batch:"提前批",
+   majors:["中国画","绘画","雕塑","视觉传达设计","环境设计","产品设计"],planCount:30,tuition:"15000元/年",
+   desc:"东北地区最高美术学府，红色美院",tags:["公办","美院"],
+   scores:{2025:{prof:262,culture:448,total:552,rank:879},2024:{prof:260,culture:442,total:546,rank:1499},2023:{prof:258,culture:435,total:540,rank:2550}}},
+  {id:83,name:"吉林艺术学院",
+     schoolCode:"9917",city:"长春",region:"东北地区",type:"公办",batch:"本科A段",
+   majors:["绘画","雕塑","视觉传达设计","环境设计","产品设计","服装与服饰设计"],planCount:40,tuition:"12000元/年",
+   desc:"东北地区综合性艺术院校",tags:["公办"],
+   scores:{2025:{prof:220,culture:385,total:472,rank:16099},2024:{prof:218,culture:380,total:466,rank:27509},2023:{prof:215,culture:372,total:458,rank:32601}}},
+  {id:84,name:"哈尔滨师范大学",
+     schoolCode:"3720",city:"哈尔滨",region:"东北地区",type:"公办",batch:"本科A段",
+   majors:["美术学","绘画","视觉传达设计","环境设计"],planCount:35,tuition:"10000元/年",
+   desc:"东北地区重要师范院校，美术学实力强",tags:["公办"],
+   scores:{2025:{prof:215,culture:380,total:468,rank:21044},2024:{prof:212,culture:375,total:462,rank:31809},2023:{prof:210,culture:368,total:455,rank:37700}}},
+  {id:85,name:"大连工业大学",
+     schoolCode:"10152",city:"大连",region:"东北地区",type:"公办",batch:"本科A段",
+   majors:["视觉传达设计","环境设计","产品设计","服装与服饰设计","数字媒体艺术"],planCount:35,tuition:"10000元/年",
+   desc:"服装设计与工程国家特色专业",tags:["公办"],
+   scores:{2025:{prof:225,culture:392,total:478,rank:12218},2024:{prof:222,culture:386,total:472,rank:21412},2023:{prof:220,culture:378,total:465,rank:25865}}},
+  {id:86,name:"沈阳航空航天大学",
+     schoolCode:"3550",city:"沈阳",region:"东北地区",type:"公办",batch:"本科A段",
+   majors:["视觉传达设计","环境设计","产品设计","数字媒体艺术"],planCount:20,tuition:"10000元/年",
+   desc:"航空航天特色，设计学科兼备",tags:["公办"],
+   scores:{2025:{prof:212,culture:375,total:460,rank:25717},2024:{prof:210,culture:370,total:455,rank:31809},2023:{prof:208,culture:362,total:448,rank:44554}}},
+  {id:87,name:"郑州美术学院",
+     schoolCode:"6198",city:"郑州",region:"河南省内",type:"民办",batch:"本科B段",
+   majors:["绘画","雕塑","视觉传达设计","环境设计","产品设计"],planCount:200,tuition:"18000元/年",
+   desc:"河南省属美术类本科院校",tags:["民办"],
+   scores:{2025:{prof:180,culture:330,total:380,rank:52038},2024:{prof:178,culture:325,total:375,rank:59327},2023:{prof:175,culture:318,total:368,rank:63759}}},
+  {id:88,name:"信阳学院",
+     schoolCode:"6508",city:"信阳",region:"河南省内",type:"民办",batch:"本科B段",
+   majors:["美术学","视觉传达设计","环境设计"],planCount:120,tuition:"16000元/年",
+   desc:"民办本科院校",tags:["民办"],
+   scores:{2025:{prof:170,culture:315,total:365,rank:53643},2024:{prof:168,culture:310,total:360,rank:59327},2023:{prof:165,culture:302,total:352,rank:63759}}},
+  {id:89,name:"安阳学院",
+     schoolCode:"6507",city:"安阳",region:"河南省内",type:"民办",batch:"本科B段",
+   majors:["美术学","视觉传达设计","环境设计"],planCount:100,tuition:"16000元/年",
+   desc:"民办本科院校",tags:["民办"],
+   scores:{2025:{prof:168,culture:312,total:362,rank:53643},2024:{prof:165,culture:308,total:356,rank:59327},2023:{prof:162,culture:300,total:348,rank:63759}}},
+  {id:90,name:"商丘学院",
+     schoolCode:"6200",city:"商丘",region:"河南省内",type:"民办",batch:"本科B段",
+   majors:["视觉传达设计","环境设计","服装与服饰设计"],planCount:110,tuition:"16000元/年",
+   desc:"民办本科院校",tags:["民办"],
+   scores:{2025:{prof:165,culture:310,total:358,rank:53643},2024:{prof:162,culture:305,total:352,rank:59327},2023:{prof:160,culture:298,total:345,rank:63759}}},
+  {id:91,name:"郑州经贸学院",
+     schoolCode:"6504",city:"郑州",region:"河南省内",type:"民办",batch:"本科B段",
+   majors:["视觉传达设计","环境设计","服装与服饰设计"],planCount:130,tuition:"16500元/年",
+   desc:"民办本科院校",tags:["民办"],
+   scores:{2025:{prof:172,culture:318,total:370,rank:53643},2024:{prof:170,culture:312,total:364,rank:59327},2023:{prof:168,culture:305,total:358,rank:63759}}},
+  {id:92,name:"河南开封科技传媒学院",
+     schoolCode:"6511",city:"开封",region:"河南省内",type:"民办",batch:"本科B段",
+   majors:["视觉传达设计","环境设计","动画"],planCount:100,tuition:"16000元/年",
+   desc:"民办本科院校",tags:["民办"],
+   scores:{2025:{prof:167,culture:312,total:362,rank:53643},2024:{prof:165,culture:308,total:356,rank:59327},2023:{prof:162,culture:300,total:348,rank:63759}}},
+  {id:93,name:"郑州西亚斯学院",
+     schoolCode:"6003",city:"郑州",region:"河南省内",type:"民办",batch:"本科B段",
+   majors:["视觉传达设计","环境设计","产品设计"],planCount:80,tuition:"17000元/年",
+   desc:"中外合作办学特色的民办本科",tags:["民办"],
+   scores:{2025:{prof:175,culture:322,total:376,rank:53643},2024:{prof:172,culture:318,total:370,rank:59327},2023:{prof:170,culture:310,total:362,rank:63759}}},
+  {id:94,name:"郑州财经学院",
+     schoolCode:"6185",city:"郑州",region:"河南省内",type:"民办",batch:"本科B段",
+   majors:["视觉传达设计","环境设计"],planCount:90,tuition:"16500元/年",
+   desc:"财经类民办本科",tags:["民办"],
+   scores:{2025:{prof:170,culture:315,total:368,rank:53643},2024:{prof:168,culture:310,total:362,rank:59327},2023:{prof:165,culture:302,total:355,rank:63759}}},
+  {id:95,name:"黄河交通学院",
+     schoolCode:"6226",city:"焦作",region:"河南省内",type:"民办",batch:"本科B段",
+   majors:["视觉传达设计","环境设计"],planCount:60,tuition:"16000元/年",
+   desc:"交通特色民办本科",tags:["民办"],
+   scores:{2025:{prof:163,culture:305,total:358,rank:53643},2024:{prof:160,culture:300,total:352,rank:59327},2023:{prof:158,culture:292,total:345,rank:63759}}},
   ],
   // API: 通过城市获取地区分组
   getSchoolsByRegion(){
     const map = {};
     this.schools.forEach(s => {
-      if(!map[s.region]) map[s.region] = [  {id:46,name:"东北师范大学",city:"长春",region:"东北地区",type:"公办",level:"211",batch:"提前批",
-   majors:["美术学","雕塑","设计学类"],planCount:18,tuition:"12000元/年",
-   desc:"教育部直属211师范大学，美术学实力强劲",tags:["公办","211"],
-   scores:{2025:{prof:250,culture:435,total:528},2024:{prof:248,culture:430,total:522},2023:{prof:245,culture:422,total:514}}},
-  {id:47,name:"华中师范大学",city:"武汉",region:"华中地区",type:"公办",level:"211",batch:"提前批",
-   majors:["美术学","视觉传达设计","环境设计"],planCount:20,tuition:"10350元/年",
-   desc:"教育部直属211师范院校",tags:["公办","211"],
-   scores:{2025:{prof:248,culture:432,total:526},2024:{prof:245,culture:428,total:520},2023:{prof:242,culture:420,total:512}}},
-  {id:48,name:"陕西师范大学",city:"西安",region:"西北地区",type:"公办",level:"211",batch:"提前批",
-   majors:["美术学","绘画","视觉传达设计"],planCount:16,tuition:"11000元/年",
-   desc:"教育部直属211师范大学，美术学国家特色专业",tags:["公办","211"],
-   scores:{2025:{prof:242,culture:425,total:518},2024:{prof:240,culture:420,total:512},2023:{prof:238,culture:412,total:505}}},
-  {id:49,name:"湖南师范大学",city:"长沙",region:"华中地区",type:"公办",level:"211",batch:"本科A段",
-   majors:["美术学","绘画","艺术设计学"],planCount:22,tuition:"10000元/年",
-   desc:"211工程师范大学，美术学科实力雄厚",tags:["公办","211"],
-   scores:{2025:{prof:240,culture:420,total:512},2024:{prof:238,culture:415,total:506},2023:{prof:235,culture:408,total:498}}},
-  {id:50,name:"南京师范大学",city:"南京",region:"华东地区",type:"公办",level:"211",batch:"本科A段",
-   majors:["美术学","绘画","视觉传达设计"],planCount:15,tuition:"11000元/年",
-   desc:"211师范大学，美术学国家一流专业",tags:["公办","211"],
-   scores:{2025:{prof:252,culture:438,total:530},2024:{prof:250,culture:432,total:524},2023:{prof:248,culture:425,total:515}}},
-  {id:51,name:"上海大学",city:"上海",region:"华东地区",type:"公办",level:"211",batch:"本科A段",
-   majors:["绘画","视觉传达设计","环境设计","数字媒体艺术"],planCount:20,tuition:"10000元/年",
-   desc:"211工程综合性大学，上海美术学院实力强劲",tags:["公办","211"],
-   scores:{2025:{prof:255,culture:442,total:535},2024:{prof:252,culture:438,total:528},2023:{prof:250,culture:430,total:520}}},
-  {id:52,name:"苏州大学",city:"苏州",region:"华东地区",type:"公办",level:"211",batch:"本科A段",
-   majors:["美术学","视觉传达设计","环境设计","产品设计"],planCount:18,tuition:"11000元/年",
-   desc:"211工程大学，设计学科实力突出",tags:["公办","211"],
-   scores:{2025:{prof:248,culture:430,total:520},2024:{prof:245,culture:425,total:514},2023:{prof:242,culture:418,total:505}}},
-  {id:53,name:"江南大学",city:"无锡",region:"华东地区",type:"公办",level:"211",batch:"本科A段",
-   majors:["视觉传达设计","环境设计","产品设计","服装与服饰设计"],planCount:22,tuition:"11000元/年",
-   desc:"211工程大学，设计学科全国闻名",tags:["公办","211"],
-   scores:{2025:{prof:250,culture:435,total:528},2024:{prof:248,culture:430,total:522},2023:{prof:245,culture:422,total:514}}},
-  {id:54,name:"东华大学",city:"上海",region:"华东地区",type:"公办",level:"211",batch:"提前批",
-   majors:["服装与服饰设计","视觉传达设计","环境设计","数字媒体艺术"],planCount:25,tuition:"10000元/年",
-   desc:"211工程大学，服装设计全国领先",tags:["公办","211"],
-   scores:{2025:{prof:258,culture:448,total:545},2024:{prof:255,culture:442,total:538},2023:{prof:252,culture:435,total:530}}},
-  {id:55,name:"北京印刷学院",city:"北京",region:"京津地区",type:"公办",batch:"本科A段",
-   majors:["视觉传达设计","数字媒体艺术","绘画","动画"],planCount:20,tuition:"10000元/年",
-   desc:"印刷与设计特色院校，数字媒体领先",tags:["公办"],
-   scores:{2025:{prof:235,culture:405,total:498},2024:{prof:232,culture:400,total:492},2023:{prof:230,culture:392,total:485}}},
-  {id:56,name:"天津科技大学",city:"天津",region:"京津地区",type:"公办",batch:"本科A段",
-   majors:["视觉传达设计","环境设计","产品设计"],planCount:25,tuition:"12000元/年",
-   desc:"工科为主，设计学科并重",tags:["公办"],
-   scores:{2025:{prof:225,culture:395,total:488},2024:{prof:222,culture:390,total:482},2023:{prof:220,culture:382,total:475}}},
-  {id:57,name:"河北工业大学",city:"天津",region:"京津地区",type:"公办",level:"211",batch:"本科A段",
-   majors:["视觉传达设计","环境设计"],planCount:15,tuition:"11000元/年",
-   desc:"211工程大学，位于天津",tags:["公办","211"],
-   scores:{2025:{prof:240,culture:415,total:505},2024:{prof:238,culture:410,total:498},2023:{prof:235,culture:402,total:490}}},
-  {id:58,name:"山西大学",city:"太原",region:"西北地区",type:"公办",level:"双一流",batch:"本科A段",
-   majors:["美术学","绘画","视觉传达设计","环境设计"],planCount:30,tuition:"10000元/年",
-   desc:"双一流建设高校，百年名校",tags:["公办","双一流"],
-   scores:{2025:{prof:230,culture:400,total:488},2024:{prof:228,culture:395,total:482},2023:{prof:225,culture:388,total:475}}},
-  {id:59,name:"太原理工大学",city:"太原",region:"西北地区",type:"公办",level:"211",batch:"本科A段",
-   majors:["视觉传达设计","环境设计","绘画"],planCount:20,tuition:"10000元/年",
-   desc:"211工程大学，山西唯一211",tags:["公办","211"],
-   scores:{2025:{prof:235,culture:408,total:498},2024:{prof:232,culture:402,total:492},2023:{prof:230,culture:395,total:485}}},
-  {id:60,name:"安徽大学",city:"合肥",region:"华东地区",type:"公办",level:"211",batch:"本科A段",
-   majors:["视觉传达设计","环境设计","绘画"],planCount:18,tuition:"10000元/年",
-   desc:"211工程综合性大学",tags:["公办","211"],
-   scores:{2025:{prof:238,culture:412,total:504},2024:{prof:235,culture:408,total:496},2023:{prof:232,culture:400,total:488}}},
-  {id:61,name:"福州大学",city:"福州",region:"华东地区",type:"公办",level:"211",batch:"本科A段",
-   majors:["视觉传达设计","环境设计","产品设计","服装与服饰设计"],planCount:22,tuition:"10000元/年",
-   desc:"211工程大学，厦门工艺美术学院",tags:["公办","211"],
-   scores:{2025:{prof:242,culture:418,total:510},2024:{prof:240,culture:412,total:504},2023:{prof:238,culture:405,total:496}}},
-  {id:62,name:"南昌大学",city:"南昌",region:"华东地区",type:"公办",level:"211",batch:"本科A段",
-   majors:["绘画","视觉传达设计","环境设计","产品设计"],planCount:25,tuition:"10000元/年",
-   desc:"211工程综合性大学，设计学科齐全",tags:["公办","211"],
-   scores:{2025:{prof:235,culture:408,total:496},2024:{prof:232,culture:402,total:490},2023:{prof:230,culture:395,total:482}}},
-  {id:63,name:"山东大学",city:"济南",region:"华东地区",type:"公办",level:"985/211",batch:"本科A段",
-   majors:["美术学","视觉传达设计"],planCount:12,tuition:"10000元/年",
-   desc:"985工程重点大学",tags:["公办","985"],
-   scores:{2025:{prof:260,culture:450,total:548},2024:{prof:258,culture:445,total:542},2023:{prof:255,culture:438,total:534}}},
-  {id:64,name:"中国地质大学（武汉）",city:"武汉",region:"华中地区",type:"公办",level:"211",batch:"本科A段",
-   majors:["视觉传达设计","环境设计","数字媒体艺术"],planCount:20,tuition:"10350元/年",
-   desc:"211工程大学，珠宝设计为特色",tags:["公办","211"],
-   scores:{2025:{prof:242,culture:420,total:510},2024:{prof:240,culture:415,total:504},2023:{prof:238,culture:408,total:498}}},
-  {id:65,name:"中南财经政法大学",city:"武汉",region:"华中地区",type:"公办",level:"211",batch:"本科A段",
-   majors:["视觉传达设计","动画","数字媒体艺术"],planCount:15,tuition:"10350元/年",
-   desc:"211工程财经政法特色大学",tags:["公办","211"],
-   scores:{2025:{prof:238,culture:415,total:505},2024:{prof:235,culture:410,total:498},2023:{prof:232,culture:402,total:490}}},
-  {id:66,name:"西南大学",city:"重庆",region:"西南地区",type:"公办",level:"211",batch:"本科A段",
-   majors:["美术学","绘画","视觉传达设计"],planCount:25,tuition:"10000元/年",
-   desc:"211工程综合性大学，师范与艺术并重",tags:["公办","211"],
-   scores:{2025:{prof:240,culture:418,total:508},2024:{prof:238,culture:412,total:502},2023:{prof:235,culture:405,total:494}}},
-  {id:67,name:"四川大学",city:"成都",region:"西南地区",type:"公办",level:"985/211",batch:"本科A段",
-   majors:["绘画","视觉传达设计","环境设计"],planCount:15,tuition:"10000元/年",
-   desc:"985工程重点大学，西南最高学府",tags:["公办","985"],
-   scores:{2025:{prof:258,culture:448,total:545},2024:{prof:255,culture:442,total:538},2023:{prof:252,culture:435,total:530}}},
-  {id:68,name:"重庆大学",city:"重庆",region:"西南地区",type:"公办",level:"985/211",batch:"本科A段",
-   majors:["绘画","视觉传达设计","环境设计","产品设计"],planCount:18,tuition:"10000元/年",
-   desc:"985工程重点大学，设计学科强势",tags:["公办","985"],
-   scores:{2025:{prof:255,culture:442,total:538},2024:{prof:252,culture:438,total:532},2023:{prof:250,culture:430,total:525}}},
-  {id:69,name:"西南交通大学",city:"成都",region:"西南地区",type:"公办",level:"211",batch:"本科A段",
-   majors:["视觉传达设计","环境设计","产品设计"],planCount:20,tuition:"10000元/年",
-   desc:"211工程大学，交通设计特色",tags:["公办","211"],
-   scores:{2025:{prof:232,culture:405,total:492},2024:{prof:230,culture:400,total:486},2023:{prof:228,culture:392,total:478}}},
-  {id:70,name:"长安大学",city:"西安",region:"西北地区",type:"公办",level:"211",batch:"本科A段",
-   majors:["环境设计","视觉传达设计"],planCount:15,tuition:"11000元/年",
-   desc:"211工程大学，工科为主",tags:["公办","211"],
-   scores:{2025:{prof:228,culture:398,total:486},2024:{prof:225,culture:392,total:480},2023:{prof:222,culture:385,total:472}}},
-  {id:71,name:"西北农林科技大学",city:"杨凌",region:"西北地区",type:"公办",level:"985/211",batch:"本科A段",
-   majors:["环境设计","视觉传达设计"],planCount:12,tuition:"10000元/年",
-   desc:"985工程重点大学，农林特色",tags:["公办","985"],
-   scores:{2025:{prof:225,culture:395,total:482},2024:{prof:222,culture:390,total:476},2023:{prof:220,culture:382,total:468}}},
-  {id:72,name:"陕西科技大学",city:"西安",region:"西北地区",type:"公办",batch:"本科A段",
-   majors:["视觉传达设计","环境设计","产品设计","动画"],planCount:30,tuition:"10000元/年",
-   desc:"轻工与设计特色院校",tags:["公办"],
-   scores:{2025:{prof:218,culture:385,total:472},2024:{prof:215,culture:380,total:466},2023:{prof:212,culture:372,total:458}}},
-  {id:73,name:"西安建筑科技大学",city:"西安",region:"西北地区",type:"公办",batch:"本科A段",
-   majors:["环境设计","视觉传达设计","产品设计"],planCount:25,tuition:"10000元/年",
-   desc:"建筑类特色院校，环境设计实力强",tags:["公办"],
-   scores:{2025:{prof:220,culture:388,total:475},2024:{prof:218,culture:382,total:468},2023:{prof:215,culture:375,total:460}}},
-  {id:74,name:"西北大学",city:"西安",region:"西北地区",type:"公办",level:"211",batch:"本科A段",
-   majors:["美术学","视觉传达设计","环境设计","动画"],planCount:22,tuition:"10000元/年",
-   desc:"211工程综合性大学，艺术底蕴深厚",tags:["公办","211"],
-   scores:{2025:{prof:238,culture:412,total:502},2024:{prof:235,culture:408,total:496},2023:{prof:232,culture:400,total:488}}},
-  {id:75,name:"广州美术学院",city:"广州",region:"华南地区",type:"公办",batch:"提前批",
-   majors:["绘画","雕塑","视觉传达设计","环境设计","产品设计"],planCount:28,tuition:"15000元/年",
-   desc:"华南地区最高美术学府",tags:["公办","美院"],
-   scores:{2025:{prof:265,culture:452,total:558},2024:{prof:262,culture:448,total:552},2023:{prof:260,culture:440,total:545}}},
-  {id:76,name:"华南师范大学",city:"广州",region:"华南地区",type:"公办",level:"211",batch:"本科A段",
-   majors:["美术学","视觉传达设计","环境设计","数字媒体艺术"],planCount:20,tuition:"10000元/年",
-   desc:"211师范大学，美术教育突出",tags:["公办","211"],
-   scores:{2025:{prof:242,culture:422,total:510},2024:{prof:240,culture:418,total:504},2023:{prof:238,culture:410,total:496}}},
-  {id:77,name:"深圳大学",city:"深圳",region:"华南地区",type:"公办",batch:"本科A段",
-   majors:["视觉传达设计","环境设计","产品设计","数字媒体艺术"],planCount:25,tuition:"10000元/年",
-   desc:"深圳市属综合性大学，设计学科发展迅猛",tags:["公办"],
-   scores:{2025:{prof:245,culture:428,total:515},2024:{prof:242,culture:422,total:508},2023:{prof:240,culture:415,total:500}}},
-  {id:78,name:"广东工业大学",city:"广州",region:"华南地区",type:"公办",batch:"本科A段",
-   majors:["视觉传达设计","环境设计","产品设计","服装与服饰设计","数字媒体艺术"],planCount:35,tuition:"10000元/年",
-   desc:"工科为主，设计学科齐全",tags:["公办"],
-   scores:{2025:{prof:228,culture:398,total:485},2024:{prof:225,culture:392,total:478},2023:{prof:222,culture:385,total:470}}},
-  {id:79,name:"广西艺术学院",city:"南宁",region:"华南地区",type:"公办",batch:"本科A段",
-   majors:["绘画","雕塑","视觉传达设计","环境设计","产品设计","服装与服饰设计"],planCount:45,tuition:"12000元/年",
-   desc:"省属综合性艺术院校",tags:["公办"],
-   scores:{2025:{prof:225,culture:390,total:480},2024:{prof:222,culture:385,total:474},2023:{prof:220,culture:378,total:466}}},
-  {id:80,name:"云南艺术学院",city:"昆明",region:"西南地区",type:"公办",batch:"本科A段",
-   majors:["绘画","雕塑","视觉传达设计","环境设计","产品设计"],planCount:40,tuition:"12000元/年",
-   desc:"西南地区重要综合性艺术院校",tags:["公办"],
-   scores:{2025:{prof:222,culture:388,total:478},2024:{prof:220,culture:382,total:472},2023:{prof:218,culture:375,total:465}}},
-  {id:81,name:"四川音乐学院",city:"成都",region:"西南地区",type:"公办",batch:"本科A段",
-   majors:["绘画","雕塑","视觉传达设计","环境设计","数字媒体艺术"],planCount:30,tuition:"12000元/年",
-   desc:"知名艺术院校，美术设计并重",tags:["公办"],
-   scores:{2025:{prof:230,culture:398,total:488},2024:{prof:228,culture:392,total:482},2023:{prof:225,culture:385,total:475}}},
-  {id:82,name:"鲁迅美术学院",city:"沈阳",region:"东北地区",type:"公办",batch:"提前批",
-   majors:["中国画","绘画","雕塑","视觉传达设计","环境设计","产品设计"],planCount:30,tuition:"15000元/年",
-   desc:"东北地区最高美术学府，红色美院",tags:["公办","美院"],
-   scores:{2025:{prof:262,culture:448,total:552},2024:{prof:260,culture:442,total:546},2023:{prof:258,culture:435,total:540}}},
-  {id:83,name:"吉林艺术学院",city:"长春",region:"东北地区",type:"公办",batch:"本科A段",
-   majors:["绘画","雕塑","视觉传达设计","环境设计","产品设计","服装与服饰设计"],planCount:40,tuition:"12000元/年",
-   desc:"东北地区综合性艺术院校",tags:["公办"],
-   scores:{2025:{prof:220,culture:385,total:472},2024:{prof:218,culture:380,total:466},2023:{prof:215,culture:372,total:458}}},
-  {id:84,name:"哈尔滨师范大学",city:"哈尔滨",region:"东北地区",type:"公办",batch:"本科A段",
-   majors:["美术学","绘画","视觉传达设计","环境设计"],planCount:35,tuition:"10000元/年",
-   desc:"东北地区重要师范院校，美术学实力强",tags:["公办"],
-   scores:{2025:{prof:215,culture:380,total:468},2024:{prof:212,culture:375,total:462},2023:{prof:210,culture:368,total:455}}},
-  {id:85,name:"大连工业大学",city:"大连",region:"东北地区",type:"公办",batch:"本科A段",
-   majors:["视觉传达设计","环境设计","产品设计","服装与服饰设计","数字媒体艺术"],planCount:35,tuition:"10000元/年",
-   desc:"服装设计与工程国家特色专业",tags:["公办"],
-   scores:{2025:{prof:225,culture:392,total:478},2024:{prof:222,culture:386,total:472},2023:{prof:220,culture:378,total:465}}},
-  {id:86,name:"沈阳航空航天大学",city:"沈阳",region:"东北地区",type:"公办",batch:"本科A段",
-   majors:["视觉传达设计","环境设计","产品设计","数字媒体艺术"],planCount:20,tuition:"10000元/年",
-   desc:"航空航天特色，设计学科兼备",tags:["公办"],
-   scores:{2025:{prof:212,culture:375,total:460},2024:{prof:210,culture:370,total:455},2023:{prof:208,culture:362,total:448}}},
-  {id:87,name:"郑州美术学院",city:"郑州",region:"河南省内",type:"民办",batch:"本科B段",
-   majors:["绘画","雕塑","视觉传达设计","环境设计","产品设计"],planCount:200,tuition:"18000元/年",
-   desc:"河南省属美术类本科院校",tags:["民办"],
-   scores:{2025:{prof:180,culture:330,total:380},2024:{prof:178,culture:325,total:375},2023:{prof:175,culture:318,total:368}}},
-  {id:88,name:"信阳学院",city:"信阳",region:"河南省内",type:"民办",batch:"本科B段",
-   majors:["美术学","视觉传达设计","环境设计"],planCount:120,tuition:"16000元/年",
-   desc:"民办本科院校",tags:["民办"],
-   scores:{2025:{prof:170,culture:315,total:365},2024:{prof:168,culture:310,total:360},2023:{prof:165,culture:302,total:352}}},
-  {id:89,name:"安阳学院",city:"安阳",region:"河南省内",type:"民办",batch:"本科B段",
-   majors:["美术学","视觉传达设计","环境设计"],planCount:100,tuition:"16000元/年",
-   desc:"民办本科院校",tags:["民办"],
-   scores:{2025:{prof:168,culture:312,total:362},2024:{prof:165,culture:308,total:356},2023:{prof:162,culture:300,total:348}}},
-  {id:90,name:"商丘学院",city:"商丘",region:"河南省内",type:"民办",batch:"本科B段",
-   majors:["视觉传达设计","环境设计","服装与服饰设计"],planCount:110,tuition:"16000元/年",
-   desc:"民办本科院校",tags:["民办"],
-   scores:{2025:{prof:165,culture:310,total:358},2024:{prof:162,culture:305,total:352},2023:{prof:160,culture:298,total:345}}},
-  {id:91,name:"郑州经贸学院",city:"郑州",region:"河南省内",type:"民办",batch:"本科B段",
-   majors:["视觉传达设计","环境设计","服装与服饰设计"],planCount:130,tuition:"16500元/年",
-   desc:"民办本科院校",tags:["民办"],
-   scores:{2025:{prof:172,culture:318,total:370},2024:{prof:170,culture:312,total:364},2023:{prof:168,culture:305,total:358}}},
-  {id:92,name:"河南开封科技传媒学院",city:"开封",region:"河南省内",type:"民办",batch:"本科B段",
-   majors:["视觉传达设计","环境设计","动画"],planCount:100,tuition:"16000元/年",
-   desc:"民办本科院校",tags:["民办"],
-   scores:{2025:{prof:167,culture:312,total:362},2024:{prof:165,culture:308,total:356},2023:{prof:162,culture:300,total:348}}},
-  {id:93,name:"郑州西亚斯学院",city:"郑州",region:"河南省内",type:"民办",batch:"本科B段",
-   majors:["视觉传达设计","环境设计","产品设计"],planCount:80,tuition:"17000元/年",
-   desc:"中外合作办学特色的民办本科",tags:["民办"],
-   scores:{2025:{prof:175,culture:322,total:376},2024:{prof:172,culture:318,total:370},2023:{prof:170,culture:310,total:362}}},
-  {id:94,name:"郑州财经学院",city:"郑州",region:"河南省内",type:"民办",batch:"本科B段",
-   majors:["视觉传达设计","环境设计"],planCount:90,tuition:"16500元/年",
-   desc:"财经类民办本科",tags:["民办"],
-   scores:{2025:{prof:170,culture:315,total:368},2024:{prof:168,culture:310,total:362},2023:{prof:165,culture:302,total:355}}},
-  {id:95,name:"黄河交通学院",city:"焦作",region:"河南省内",type:"民办",batch:"本科B段",
-   majors:["视觉传达设计","环境设计"],planCount:60,tuition:"16000元/年",
-   desc:"交通特色民办本科",tags:["民办"],
-   scores:{2025:{prof:163,culture:305,total:358},2024:{prof:160,culture:300,total:352},2023:{prof:158,culture:292,total:345}}},
-
-];
+            if(!map[s.region]) map[s.region] = [];
       map[s.region].push(s);
     });
     return map;
@@ -823,7 +853,7 @@ const app = {
 
   // ---- 工具函数 ----
   calcTotal(prof, culture, type){
-    const f = DB.formulas[type] || DB.formulas['美术与设计类'];
+    const f = DB.formulas[type] || DB.formulas['w5z5'];
     return { total: prof * f.profWeight + culture * f.cultureWeight, formula: f.label };
   },
   judgeLevel(userTotal, schTotal){
@@ -833,7 +863,8 @@ const app = {
     return 'bao';
   },
   computeProb(userTotal, sch){
-    const diff = sch.totalScore - userTotal;
+    const schTotal = sch.totalScore || (sch.scores && sch.scores["2025"] && sch.scores["2025"].total) || 0;
+    const diff = schTotal - userTotal;
     if(diff > 15) return { text:'冲刺', pct:Math.max(10,40-diff*1.5), level:'chong' };
     if(diff > 5) return { text:'冲刺', pct:Math.max(20,55-diff*3), level:'chong' };
     if(diff >= -5) return { text:'稳妥', pct:Math.max(50,75-diff*2), level:'wen' };
@@ -841,6 +872,20 @@ const app = {
     return { text:'保底', pct:Math.min(98,92-diff), level:'bao' };
   },
 
+  // ---- 实时计算综合分预览 ----
+  liveCalc(){
+    var prof = parseFloat(document.getElementById("input-prof").value) || 0;
+    var culture = parseFloat(document.getElementById("input-culture").value) || 0;
+    var el = document.getElementById("calc-preview");
+    if(!prof || !culture){
+      el.textContent = "请先填写专业分和文化课成绩";
+      return;
+    }
+    var formulaType = document.getElementById("input-formula").value;
+    var f = DB.formulas[formulaType] || DB.formulas['w5z5'];
+    var total = prof * f.profWeight + culture * f.cultureWeight;
+    el.textContent = total.toFixed(1) + ' 分';
+  },
   // ---- 导航 ----
   nav(pageId){
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -851,7 +896,6 @@ const app = {
     this.updatePlanBadge();
     if(pageId === 'page-plan') this.renderPlan();
     if(pageId === 'page-compare') this.renderCompare();
-    if(pageId === 'page-tools') this.initCityChart();
   },
   goHome(){ this.nav('page-home'); },
 
@@ -859,20 +903,17 @@ const app = {
   recommend(){
     var inpProf = document.getElementById("input-prof");
     var inpCult = document.getElementById("input-culture");
-    var inpRank = document.getElementById("input-rank");
     if(!inpProf || !inpProf.value || inpProf.value.trim() === ""){ alert("请填写统考专业分"); return; }
     if(!inpCult || !inpCult.value || inpCult.value.trim() === ""){ alert("请填写文化课成绩"); return; }
     var profVal = inpProf.value.trim();
     var cultVal = inpCult.value.trim();
-    var rankVal = inpRank.value.trim();
     var prof = Number(profVal) || 0;
     var culture = Number(cultVal) || 0;
-    var rank = parseInt(rankVal) || 0;
     var majorType = document.getElementById("input-major-type").value;
-    var batch = document.getElementById("input-batch").value;
+    var formulaType = document.getElementById("input-formula").value;
     var category = document.getElementById("input-category").value;
-    var total = this.calcTotal(prof, culture, majorType).total;
-    this.state.user = { category, majorType, profScore:prof, cultureScore:culture, rank, batch };
+    var total = this.calcTotal(prof, culture, formulaType).total;
+    this.state.user = { category, majorType, profScore:prof, cultureScore:culture, rank:0, batch:'all' };
     this.state.filter = "all";
     this.state.filterBatch = "all";
     document.getElementById("show-prof").textContent = prof;
@@ -880,7 +921,11 @@ const app = {
     document.getElementById("show-total").textContent = "综合分: " + total.toFixed(1);
     var scored = DB.schools.map(function(s){
       var prob = this.computeProb(total, s);
-      return Object.assign({}, s, { userProb:prob, userTotal:total });
+      return Object.assign({}, s, {
+        userProb: prob,
+        userTotal: total,
+        totalScore: s.totalScore || (s.scores && s.scores["2025"] && s.scores["2025"].total) || 0
+      });
     }.bind(this));
     scored.sort(function(a,b){ return b.userProb.pct - a.userProb.pct; });
     this.state.results = scored;
@@ -929,42 +974,39 @@ const app = {
       const fc = `fill-${p.level}`;
       const isFav = this.state.fav.has(s.id) ? 'fas' : 'far';
       const inCompare = this.state.compare.includes(s.id);
+      const inPlan = this.state.plan.chong.concat(this.state.plan.wen).concat(this.state.plan.bao).some(function(p){ return p.id === s.id; });
       return `
       <div class="card school-card" onclick="app.showDetail(${s.id})">
         <div class="school-header">
           <div>
             <div class="school-name">${s.name}</div>
+            <div style="font-size:0.85rem;">${s.schoolCode||""}</div>
             <div class="school-meta">${s.city} · ${s.type}${s.level ? ' · '+s.level : ''} · ${s.batch}</div>
           </div>
           <span class="btn-tag ${lc}">${lt}</span>
         </div>
-        <div style="display:flex;justify-content:space-between;align-items:center;">
-          <div style="flex:1;margin-right:12px;">
-            <div style="font-size:0.85rem;font-weight:600;color:${p.level==='chong'?'var(--primary)':p.level==='wen'?'var(--orange)':'var(--green)'}">录取概率 ${Math.round(p.pct)}%</div>
-            <div class="progress-bar"><div class="fill ${fc}" style="width:${p.pct}%"></div></div>
-          </div>
-          <div style="text-align:right;">
-            <div style="font-weight:700;font-size:1rem;">${s.totalScore}</div>
-            <div style="font-size:0.7rem;color:var(--text-light);">综合分</div>
-          </div>
+        <div style="margin-bottom:4px;">
+          <span>录取概率 ${Math.round(p.pct)}%</span>
+          <span style="float:right;">${s.totalScore || (s.scores?.["2025"]?.total) || ''} 综合分</span>
         </div>
+        <div class="progress-bar"><div class="fill ${fc}" style="width:${p.pct}%"></div></div>
         <div style="margin-top:6px;">
           <div class="school-tags">
             ${s.majors.slice(0,3).map(m => `<span style="font-size:0.75rem;background:#f0f0f0;padding:2px 8px;border-radius:4px;">${m}</span>`).join('')}
             ${s.tags ? s.tags.map(t => `<span class="badge" style="background:${t==='985'?'#e74c3c':t==='211'?'#f39c12':t==='双一流'?'#3498db':t==='公办'?'#27ae60':'#95a5a6'}">${t}</span>`).join('') : ''}
           </div>
           <div class="score-row">
-            <span>📈 2025: ${s.scores['2025'].total}</span>
-            <span>2024: ${s.scores['2024'].total}</span>
-            <span>2023: ${s.scores['2023'].total}</span>
+            <span>📈 2025: ${s.scores['2025'].total}分 专业位次${s.scores['2025'].rank||'-'}</span>
+            <span>2024: ${s.scores['2024'].total}分</span>
+            <span>2023: ${s.scores['2023'].total}分</span>
           </div>
         </div>
         <div style="margin-top:8px;display:flex;gap:6px;" onclick="event.stopPropagation();">
-          <button class="btn btn-small btn-outline" onclick="app.toggleFav(${s.id});app.renderSchools();"><i class="${isFav} fa-heart" style="color:${isFav==='fas'?'var(--primary)':'var(--text-light)'}"></i></button>
+          <button class="btn btn-small ${isFav==='fas'?'btn-danger':'btn-outline'}" onclick="app.toggleFav(${s.id});app.renderSchools();"><i class="${isFav} fa-heart"></i></button>
           <button class="btn btn-small ${inCompare?'btn-success':'btn-secondary'}" onclick="app.toggleCompare(${s.id});app.renderSchools();">
             <i class="fas fa-balance-scale"></i> ${inCompare?'已对比':'对比'}
           </button>
-          <button class="btn btn-small btn-outline" onclick="app.addToPlan(${s.id});app.renderSchools();"><i class="fas fa-plus"></i> 加入</button>
+          <button class="btn btn-small ${inPlan?'btn-danger':'btn-outline'}" onclick="app.addToPlan(${s.id});app.renderSchools();"><i class="fas fa-plus"></i> ${inPlan?'已加入':'加入'}</button>
         </div>
       </div>`;
     }).join('');
@@ -1135,8 +1177,8 @@ const app = {
       container.innerHTML = items.map((s,i) => `
         <div class="plan-item">
           <div class="plan-item-info">
-            <div class="plan-item-name">${i+1}. ${s.name}</div>
-            <div class="plan-item-meta">${s.majors.slice(0,2).join('、')} · 综合分${s.totalScore} · ${s.city} · 招${s.planCount}人</div>
+            <div class="plan-item-name">${i+1}. ${s.name} [${s.schoolCode||''}]</div>
+            <div class="plan-item-meta">${s.majors.slice(0,2).map(m => m.name||m).join('、')} · 综合分${s.totalScore || (s.scores?.["2025"]?.total) || ''} · ${s.city} · 招${s.planCount}人 · ${s.tuition||''}</div>
           </div>
           <button class="btn btn-small btn-danger" onclick="app.removeFromPlan(${s.id});" style="padding:4px 10px;font-size:0.75rem;"><i class="fas fa-times"></i></button>
         </div>`).join('');
@@ -1160,7 +1202,7 @@ const app = {
     if(total === 0){ alert('志愿方案为空'); return; }
     // 构建导出HTML
     const html = `
-    <div id="pdf-export" style="width:375px;padding:20px;font-family:sans-serif;background:#fff;">
+    <div id="pdf-export" style="width:620px;padding:20px;font-family:sans-serif;background:#fff;">
       <h2 style="color:#e8453c;text-align:center;margin-bottom:8px;">🎯 河南艺术生志愿填报方案</h2>
       <p style="text-align:center;font-size:12px;color:#999;margin-bottom:16px;">生成时间: ${new Date().toLocaleString('zh-CN')}</p>
       <hr style="border:none;border-top:2px solid #e8453c;margin-bottom:12px;">
@@ -1170,13 +1212,22 @@ const app = {
         const title = k === 'chong' ? '🔼 冲刺院校' : k === 'wen' ? '➡️ 稳妥院校' : '⬇️ 保底院校';
         const color = k === 'chong' ? '#e8453c' : k === 'wen' ? '#f39c12' : '#27ae60';
         return `<h3 style="color:${color};margin-bottom:6px;">${title}</h3>
-        <table style="width:100%;border-collapse:collapse;margin-bottom:12px;font-size:12px;">
-          <tr style="background:#f5f6fa;"><th style="padding:6px;border:1px solid #ddd;text-align:left;">#</th><th style="padding:6px;border:1px solid #ddd;text-align:left;">院校</th><th style="padding:6px;border:1px solid #ddd;text-align:center;">综合分</th><th style="padding:6px;border:1px solid #ddd;text-align:center;">城市</th></tr>
-          ${items.map((s,i) => `<tr><td style="padding:6px;border:1px solid #ddd;">${i+1}</td><td style="padding:6px;border:1px solid #ddd;">${s.name}</td><td style="padding:6px;border:1px solid #ddd;text-align:center;">${s.totalScore}</td><td style="padding:6px;border:1px solid #ddd;text-align:center;">${s.city}</td></tr>`).join('')}
+        <table style="width:100%;border-collapse:collapse;margin-bottom:12px;font-size:8px;">
+          <tr style="background:#f5f6fa;"><th style="padding:2px;border:1px solid #ddd;text-align:center;">#</th><th style="padding:2px;border:1px solid #ddd;text-align:left;">院校</th><th style="padding:2px;border:1px solid #ddd;text-align:center;">代码</th><th style="padding:2px;border:1px solid #ddd;text-align:center;">综合分</th><th style="padding:2px;border:1px solid #ddd;">专业</th><th style="padding:2px;border:1px solid #ddd;text-align:center;">专业位次</th><th style="padding:2px;border:1px solid #ddd;text-align:center;">城市</th><th style="padding:2px;border:1px solid #ddd;text-align:center;">批次</th><th style="padding:2px;border:1px solid #ddd;text-align:center;">学费</th></tr>
+          ${items.map(function(s,i){
+  var ms=(s.majors||[]).map(function(m){return m.name||m;}).join('、');
+  if(!ms)ms='--';
+  var sc=s.schoolCode||'';
+  var tot=s.totalScore||(s.scores&&s.scores["2025"]&&s.scores["2025"].total)||'';
+  var rk=s.scores&&s.scores["2025"]&&s.scores["2025"].rank||'';
+  var bt=s.batch||'';
+  var tu=s.tuition||'';
+  return '<tr><td style="padding:2px;border:1px solid #ddd;text-align:center;">'+(i+1)+'</td><td style="padding:2px;border:1px solid #ddd;">'+s.name+'</td><td style="padding:2px;border:1px solid #ddd;text-align:center;">'+sc+'</td><td style="padding:2px;border:1px solid #ddd;text-align:center;">'+tot+'</td><td style="padding:2px;border:1px solid #ddd;">'+ms+'</td><td style="padding:2px;border:1px solid #ddd;text-align:center;">'+rk+'</td><td style="padding:2px;border:1px solid #ddd;text-align:center;">'+s.city+'</td><td style="padding:2px;border:1px solid #ddd;text-align:center;">'+bt+'</td><td style="padding:2px;border:1px solid #ddd;text-align:center;">'+tu+'</td></tr>';
+}).join('')}
         </table>`;
       }).join('')}
       <hr style="border:none;border-top:1px solid #eee;margin:8px 0;">
-    数据仅供参考，请以《招生考试之友》官方公布为准<br>内置45所院校模拟数据 · 支持自定义数据导入</p>
+    <div style="font-size:9px;color:#999;text-align:center;">数据仅供参考，请以《招生考试之友》官方公布为准</div>
     </div>`;
     const wrapper = document.createElement('div');
     wrapper.innerHTML = html;
@@ -1185,12 +1236,22 @@ const app = {
 
     try {
       const canvas = await html2canvas(el, { scale:2, useCORS:true, backgroundColor:'#fff' });
-      const imgData = canvas.toDataURL('image/png');
       const { jsPDF } = window.jspdf;
       const pdf = new jsPDF('p','mm','a4');
-      const pdfW = pdf.internal.pageSize.getWidth();
-      const pdfH = (canvas.height / canvas.width) * pdfW;
-      pdf.addImage(imgData, 'PNG', 0, 0, pdfW, pdfH);
+      const pageW = pdf.internal.pageSize.getWidth();
+      const pageH = pdf.internal.pageSize.getHeight();
+      const pageHpx = (pageH / pageW) * canvas.width;
+      let srcY = 0, remainingH = canvas.height, pg = 0;
+      while (remainingH > 0) {
+        const curH = Math.min(remainingH, pageHpx);
+        const c = document.createElement('canvas');
+        c.width = canvas.width; c.height = curH;
+        c.getContext('2d').drawImage(canvas, 0, srcY, canvas.width, curH, 0, 0, canvas.width, curH);
+        const img = c.toDataURL('image/png');
+        if (pg > 0) pdf.addPage();
+        pdf.addImage(img, 'PNG', 0, 0, pageW, (curH / canvas.width) * pageW);
+        srcY += curH; remainingH -= curH; pg++;
+      }
       pdf.save('河南艺术生志愿填报方案.pdf');
     } catch(e){
       alert('导出PDF失败: ' + e.message);
@@ -1206,11 +1267,11 @@ const app = {
       '河南艺术生志愿填报方案',
       '='.repeat(30),'',
       '【冲刺院校】',
-      ...this.state.plan.chong.map((s,i) => `${i+1}. ${s.name} - ${s.majors.slice(0,2).join('、')} - 综合分${s.totalScore}`),'',
+      ...this.state.plan.chong.map((s,i) => `${i+1}. ${s.name} [${s.schoolCode||''}] - ${(s.majors||[]).slice(0,2).map(m => m.name||m).join('、')} - 综合分${s.totalScore || (s.scores?.["2025"]?.total) || ''} - ${s.city} - ${s.batch||''}`),'',
       '【稳妥院校】',
-      ...this.state.plan.wen.map((s,i) => `${i+1}. ${s.name} - ${s.majors.slice(0,2).join('、')} - 综合分${s.totalScore}`),'',
+      ...this.state.plan.wen.map((s,i) => `${i+1}. ${s.name} [${s.schoolCode||''}] - ${(s.majors||[]).slice(0,2).map(m => m.name||m).join('、')} - 综合分${s.totalScore || (s.scores?.["2025"]?.total) || ''} - ${s.city} - ${s.batch||''}`),'',
       '【保底院校】',
-      ...this.state.plan.bao.map((s,i) => `${i+1}. ${s.name} - ${s.majors.slice(0,2).join('、')} - 综合分${s.totalScore}`),'',
+      ...this.state.plan.bao.map((s,i) => `${i+1}. ${s.name} [${s.schoolCode||''}] - ${(s.majors||[]).slice(0,2).map(m => m.name||m).join('、')} - 综合分${s.totalScore || (s.scores?.["2025"]?.total) || ''} - ${s.city} - ${s.batch||''}`),'',
       '='.repeat(30),
       '生成时间: ' + new Date().toLocaleString('zh-CN'),
       '数据仅供参考，以官方公布为准'
@@ -1293,6 +1354,17 @@ const app = {
   },
 
   filterByRegion(el, region){
+    var c = document.getElementById('region-schools');
+    if(!c) return;
+    document.querySelectorAll('.region-tag').forEach(function(t){ t.classList.remove('active'); });
+    if(el) el.classList.add('active');
+    var schools = DB.schools;
+    if(region) schools = schools.filter(function(s){ return s.region === region; });
+    c.innerHTML = schools.map(function(s){
+      return '<div class="chip ' + (s.type==='公办'?'chip-blue':'chip-green') + '" style="cursor:pointer;" onclick="app.showDetail(' + s.id + ')">' + s.name + '</div>';
+    }).join('');
+  },
+
   // ---- 数据导入导出 ----
   importData(){
     var text = document.getElementById("import-data").value.trim();
@@ -1364,19 +1436,11 @@ const app = {
     if(!confirm("确定恢复默认数据？自定义导入的数据将被清除。")) return;
     location.reload();
   },
-    document.querySelectorAll('.region-tag').forEach(t => t.classList.remove('active'));
-    el.classList.add('active');
-    const container = document.getElementById('region-schools');
-    let schools = DB.schools;
-    if(region) schools = schools.filter(s => s.region === region);
-    container.innerHTML = schools.map(s => `
-      <div class="chip ${s.type==='公办'?'chip-blue':'chip-green'}" style="cursor:pointer;" onclick="app.showDetail(${s.id})">${s.name}</div>
-    `).join('');
-  },
 };
 // ---- 初始化 ----
 document.addEventListener('DOMContentLoaded', () => {
-    try{});
+    try { /* ready */ } catch(e) { console.warn('Init error', e); }
+});
 </script>
 </body>
 </html>
