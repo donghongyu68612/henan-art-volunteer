@@ -1,6 +1,5 @@
 {
   "name": "henan-art-volunteer",
-  "version": "2.3",
   "description": "河南艺术生志愿填报助手 — 智能推荐·冲稳保分析·一键导出PDF",
   "framework": null,
   "buildCommand": "node scripts/build.js",
