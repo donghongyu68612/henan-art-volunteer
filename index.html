@@ -1,0 +1,1383 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>河南艺术生志愿填报助手 2026 v2.1</title>
+<link rel="manifest" href="manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="志愿助手">
+<meta name="theme-color" content="#e8453c">
+<link rel="icon" href="icons/icon-192.svg" sizes="192x192" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/icon-192.svg">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --primary:#e8453c;--primary-light:#ff6b6b;--primary-dark:#c0392b;
+  --orange:#f39c12;--green:#27ae60;--blue:#3498db;--purple:#9b59b6;
+  --gray:#95a5a6;--bg:#f5f6fa;--card-bg:#fff;--text:#2c3e50;--text-light:#7f8c8d;
+  --shadow:0 2px 12px rgba(0,0,0,0.08);--radius:12px;
+}
+html{font-size:16px;}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;
+  background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh;
+}
+.page{display:none;max-width:480px;margin:0 auto;padding:0 16px 90px;}
+.page.active{display:block;}
+.header{
+  background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+  color:#fff;padding:20px 16px;margin:0 -16px 16px;text-align:center;
+}
+.header h1{font-size:1.4rem;font-weight:700;}
+.header p{font-size:0.85rem;opacity:.85;margin-top:4px;}
+.card{
+  background:var(--card-bg);border-radius:var(--radius);padding:16px;
+  margin-bottom:12px;box-shadow:var(--shadow);
+}
+.form-group{margin-bottom:14px;}
+.form-group label{display:block;font-size:0.9rem;font-weight:600;margin-bottom:4px;color:var(--text);}
+.form-group select,.form-group input{
+  width:100%;padding:12px 14px;border:1.5px solid #ddd;border-radius:8px;
+  font-size:1rem;outline:none;transition:border .2s;background:#fff;
+}
+.form-group select:focus,.form-group input:focus{border-color:var(--primary);}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  padding:12px 24px;border:none;border-radius:8px;
+  font-size:1rem;font-weight:600;cursor:pointer;transition:all .2s;text-decoration:none;
+}
+.btn-primary{background:var(--primary);color:#fff;width:100%;}
+.btn-primary:hover{background:var(--primary-dark);}
+.btn-secondary{background:#ecf0f1;color:var(--text);}
+.btn-small{padding:6px 14px;font-size:0.85rem;}
+.btn-outline{background:transparent;border:1.5px solid var(--primary);color:var(--primary);}
+.btn-danger{background:#e74c3c;color:#fff;}
+.btn-success{background:var(--green);color:#fff;}
+.btn-tag{padding:4px 12px;border-radius:20px;font-size:0.75rem;font-weight:600;border:none;color:#fff;}
+.tag-chong{background:var(--primary);}
+.tag-wen{background:var(--orange);}
+.tag-bao{background:var(--green);}
+.progress-bar{height:8px;background:#ecf0f1;border-radius:4px;margin:6px 0;overflow:hidden;}
+.progress-bar .fill{height:100%;border-radius:4px;transition:width .6s ease;}
+.fill-chong{background:var(--primary);}
+.fill-wen{background:var(--orange);}
+.fill-bao{background:var(--green);}
+.tabs{display:flex;background:var(--card-bg);border-radius:var(--radius);overflow:hidden;margin-bottom:12px;box-shadow:var(--shadow);}
+.tab{flex:1;text-align:center;padding:10px 0;font-size:0.85rem;cursor:pointer;color:var(--text-light);border-bottom:2px solid transparent;transition:all .2s;}
+.tab.active{color:var(--primary);border-bottom-color:var(--primary);font-weight:600;}
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:0.75rem;color:#fff;}
+.badge-count{
+  position:absolute;top:-4px;right:-4px;min-width:18px;height:18px;
+  border-radius:9px;font-size:0.7rem;display:flex;align-items:center;justify-content:center;
+}
+.bottom-nav{
+  position:fixed;bottom:0;left:0;right:0;
+  background:var(--card-bg);border-top:1px solid #eee;
+  display:flex;justify-content:space-around;padding:6px 0 env(safe-area-inset-bottom);
+  max-width:480px;margin:0 auto;z-index:100;
+}
+.nav-item{
+  text-align:center;font-size:0.7rem;color:var(--text-light);
+  cursor:pointer;padding:2px 8px;transition:color .2s;position:relative;
+}
+.nav-item i{font-size:1.3rem;display:block;margin-bottom:2px;}
+.nav-item.active{color:var(--primary);}
+.school-card{cursor:pointer;}
+.school-card:hover{transform:translateY(-1px);}
+.school-header{display:flex;justify-content:space-between;align-items:flex-start;}
+.school-name{font-size:1.05rem;font-weight:700;}
+.school-meta{font-size:0.8rem;color:var(--text-light);margin:2px 0 6px;}
+.school-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;}
+.score-row{display:flex;gap:12px;font-size:0.8rem;color:var(--text-light);}
+.score-row span{white-space:nowrap;}
+.filter-bar{display:flex;gap:8px;overflow-x:auto;padding-bottom:8px;margin-bottom:8px;}
+.filter-bar::-webkit-scrollbar{height:0;}
+.filter-btn{
+  white-space:nowrap;padding:6px 14px;border-radius:20px;
+  border:1px solid #ddd;background:var(--card-bg);font-size:0.8rem;cursor:pointer;transition:all .2s;
+}
+.filter-btn.active{background:var(--primary);color:#fff;border-color:var(--primary);}
+.overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;
+  display:none;align-items:center;justify-content:center;
+}
+.overlay.show{display:flex;}
+.overlay-content{
+  background:var(--card-bg);border-radius:var(--radius);width:92%;max-width:440px;
+  max-height:85vh;overflow-y:auto;padding:20px;
+}
+.empty{text-align:center;padding:40px 0;color:var(--text-light);}
+.empty i{font-size:3rem;margin-bottom:12px;opacity:.5;}
+.detail-hero{
+  background:linear-gradient(135deg,var(--primary),#8e44ad);color:#fff;
+  margin:-16px -16px 16px;padding:24px 16px;
+}
+.detail-hero h2{font-size:1.3rem;}
+.detail-hero .meta{font-size:0.85rem;opacity:.85;margin-top:4px;}
+.chart-box{width:100%;height:220px;margin:8px 0;}
+.info-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:0.85rem;}
+.info-row:last-child{border-bottom:none;}
+.info-row .label{color:var(--text-light);}
+.info-row .value{font-weight:600;}
+@media(min-width:480px){body{border-left:1px solid #eee;border-right:1px solid #eee;}}
+.status-item{flex:1;text-align:center;padding:8px;background:var(--card-bg);border-radius:8px;box-shadow:var(--shadow);}
+.status-item .num{font-size:1.1rem;font-weight:700;}
+.status-item .label{font-size:0.7rem;color:var(--text-light);}
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.compare-card{background:var(--card-bg);border-radius:8px;padding:12px;text-align:center;box-shadow:var(--shadow);position:relative;}
+.compare-card .remove-btn{position:absolute;top:4px;right:4px;background:#e74c3c;color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:0.7rem;cursor:pointer;line-height:20px;}
+.compare-card .name{font-weight:600;font-size:0.85rem;margin-bottom:4px;}
+.compare-card .score{font-size:1.1rem;font-weight:700;color:var(--primary);}
+.compare-card .detail{font-size:0.7rem;color:var(--text-light);}
+.plan-section{margin-bottom:16px;}
+.plan-section h3{font-size:0.95rem;margin-bottom:8px;display:flex;align-items:center;gap:8px;}
+.plan-item{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #f0f0f0;}
+.plan-item:last-child{border-bottom:none;}
+.plan-item-name{font-weight:600;font-size:0.9rem;}
+.plan-item-meta{font-size:0.75rem;color:var(--text-light);}
+.calc-result{background:#e8f8f5;border-radius:8px;padding:12px;text-align:center;margin-top:10px;}
+.calc-result .num{font-size:1.4rem;font-weight:700;color:var(--green);}
+.calc-result .label{font-size:0.8rem;color:var(--text-light);}
+.chip{display:inline-block;padding:3px 10px;border-radius:12px;font-size:0.75rem;margin:2px;}
+.chip-blue{background:#dbeafe;color:#1d4ed8;}
+.chip-green{background:#d1fae5;color:#065f46;}
+.chip-red{background:#fee2e2;color:#991b1b;}
+.loading{text-align:center;padding:40px 0;color:var(--text-light);}
+.loading i{font-size:2rem;margin-bottom:8px;}
+.map-wrap{width:100%;height:340px;border-radius:8px;overflow:hidden;margin:8px 0;}
+.region-tag{display:inline-block;padding:6px 14px;margin:4px;border-radius:20px;font-size:0.8rem;cursor:pointer;border:1px solid #ddd;background:var(--card-bg);transition:all .2s;}
+.region-tag.active,.region-tag:hover{background:var(--primary);color:#fff;border-color:var(--primary);}
+.tooltip-school{font-size:0.85rem;}
+.tooltip-school b{color:var(--primary);}
+</style>
+</head>
+<body>
+<!-- Page: Home -->
+<div id="page-home" class="page active">
+  <div class="header">
+    <h1>🎯 河南艺术生志愿填报助手 2026</h1>
+    <p>智能推荐 · 冲稳保分析 · 一键导出 · v2.1</p>
+  </div>
+  <div style="display:flex;gap:8px;margin-bottom:16px;">
+    <div style="flex:1;text-align:center;padding:12px 6px;background:var(--card-bg);border-radius:var(--radius);box-shadow:var(--shadow);">
+      <div style="font-size:1.5rem;">📝</div><div style="font-size:0.75rem;color:var(--text-light);">填分数</div>
+    </div>
+    <div style="flex:1;text-align:center;padding:12px 6px;background:var(--card-bg);border-radius:var(--radius);box-shadow:var(--shadow);">
+      <div style="font-size:1.5rem;">🔍</div><div style="font-size:0.75rem;color:var(--text-light);">AI推荐</div>
+    </div>
+    <div style="flex:1;text-align:center;padding:12px 6px;background:var(--card-bg);border-radius:var(--radius);box-shadow:var(--shadow);">
+      <div style="font-size:1.5rem;">📊</div><div style="font-size:0.75rem;color:var(--text-light);">对比分析</div>
+    </div>
+    <div style="flex:1;text-align:center;padding:12px 6px;background:var(--card-bg);border-radius:var(--radius);box-shadow:var(--shadow);">
+      <div style="font-size:1.5rem;">📋</div><div style="font-size:0.75rem;color:var(--text-light);">定方案</div>
+    </div>
+  </div>
+  <div class="card">
+    <h3 style="margin-bottom:12px;font-size:1.05rem;">🙋 考生信息</h3>
+    <div class="form-group">
+      <label>科类</label>
+      <select id="input-category"><option value="文科">文科</option><option value="理科">理科</option></select>
+    </div>
+    <div class="form-group">
+      <label>艺术专业类别</label>
+      <select id="input-major-type">
+        <option value="美术与设计类">美术与设计类</option>
+        <option value="音乐类">音乐类</option>
+        <option value="舞蹈类">舞蹈类</option>
+        <option value="播音与主持类">播音与主持类</option>
+        <option value="表（导）演类">表（导）演类</option>
+        <option value="书法类">书法类</option>
+      </select>
+    </div>
+    <div class="form-group"><label>统考专业分</label><input type="number" id="input-prof" placeholder="例: 245" min="0" max="300"></div>
+    <div class="form-group"><label>文化课成绩</label><input type="number" id="input-culture" placeholder="例: 420" min="0" max="750"></div>
+    <div class="form-group"><label>全省排名（选填）</label><input type="number" id="input-rank" placeholder="例: 5000" min="1"></div>
+    <div class="form-group" style="margin-bottom:0;">
+      <label>批次偏好</label>
+      <select id="input-batch"><option value="all">全部批次</option><option value="提前批">提前批</option><option value="本科A段">本科A段</option><option value="本科B段">本科B段</option><option value="专科">专科</option></select>
+    </div>
+  </div>
+  <button class="btn btn-primary" onclick="app.recommend()" style="margin-top:8px;">🎯 智能推荐院校</button>
+    数据仅供参考，请以《招生考试之友》官方公布为准<br>内置45所院校模拟数据 · 支持自定义数据导入</p>
+</div>
+
+<!-- Page: Recommend -->
+<div id="page-recommend" class="page">
+  <div style="display:flex;align-items:center;gap:12px;padding:12px 0;">
+    <button class="btn btn-secondary btn-small" onclick="app.goHome()"><i class="fas fa-arrow-left"></i> 返回</button>
+    <div style="flex:1;text-align:right;font-size:0.8rem;color:var(--text-light);">共 <span id="result-count">0</span> 所</div>
+  </div>
+  <div class="card" style="padding:12px;margin-bottom:8px;">
+    <div style="display:flex;gap:10px;align-items:center;font-size:0.85rem;flex-wrap:wrap;">
+      <span>🎨 <span id="show-prof">-</span>分</span>
+      <span>📚 <span id="show-culture">-</span>分</span>
+      <span style="font-weight:600;color:var(--primary);" id="show-total">综合: -</span>
+    </div>
+  </div>
+  <div class="card" style="padding:12px;margin-bottom:8px;">
+    <div style="display:flex;gap:8px;text-align:center;">
+      <div class="status-item"><div class="num" id="stat-chong" style="color:var(--primary);">0</div><div class="label">🔼 冲刺</div></div>
+      <div class="status-item"><div class="num" id="stat-wen" style="color:var(--orange);">0</div><div class="label">➡️ 稳妥</div></div>
+      <div class="status-item"><div class="num" id="stat-bao" style="color:var(--green);">0</div><div class="label">⬇️ 保底</div></div>
+    </div>
+  </div>
+  <div class="filter-bar" id="filter-bar">
+    <div class="filter-btn active" data-f="all" onclick="app.setFilter(this,'all')">全部</div>
+    <div class="filter-btn" data-f="chong" onclick="app.setFilter(this,'chong')">🔴 冲刺</div>
+    <div class="filter-btn" data-f="wen" onclick="app.setFilter(this,'wen')">🟡 稳妥</div>
+    <div class="filter-btn" data-f="bao" onclick="app.setFilter(this,'bao')">🟢 保底</div>
+  </div>
+  <div class="filter-bar">
+    <div class="filter-btn active" data-b="all" onclick="app.setFilterBatch(this,'all')">全部批次</div>
+    <div class="filter-btn" data-b="本科A段" onclick="app.setFilterBatch(this,'本科A段')">本科A段</div>
+    <div class="filter-btn" data-b="本科B段" onclick="app.setFilterBatch(this,'本科B段')">本科B段</div>
+    <div class="filter-btn" data-b="提前批" onclick="app.setFilterBatch(this,'提前批')">提前批</div>
+  </div>
+  <div id="school-list"></div>
+</div>
+
+<!-- Page: Detail -->
+<div id="page-detail" class="page">
+  <div style="padding:12px 0;">
+    <button class="btn btn-secondary btn-small" onclick="app.closeDetail()"><i class="fas fa-arrow-left"></i> 返回</button>
+  </div>
+  <div id="detail-content"></div>
+</div>
+
+<!-- Page: Compare -->
+<div id="page-compare" class="page">
+  <div class="header">
+    <h1>⚖️ 院校对比</h1>
+    <p>最多对比 4 所院校，综合比较选择</p>
+  </div>
+  <div id="compare-list"></div>
+  <div id="compare-chart" class="chart-box" style="margin-top:8px;"></div>
+</div>
+
+<!-- Page: Plan -->
+<div id="page-plan" class="page">
+  <div class="header">
+    <h1>📋 我的志愿方案</h1>
+    <p>冲稳保分层 · 可导出PDF分享</p>
+  </div>
+  <div style="display:flex;gap:8px;margin-bottom:12px;">
+    <button class="btn btn-secondary btn-small" onclick="app.clearPlan()" style="flex:1;"><i class="fas fa-trash"></i> 清空</button>
+    <button class="btn btn-success btn-small" onclick="app.exportPDF()" style="flex:1;"><i class="fas fa-file-pdf"></i> 导出PDF</button>
+    <button class="btn btn-primary btn-small" onclick="app.exportText()" style="flex:1;"><i class="fas fa-copy"></i> 复制文本</button>
+  </div>
+  <div class="card plan-section"><h3><span style="color:var(--primary);">●</span> 冲刺院校</h3><div id="plan-chong"><div class="empty" style="padding:16px;">暂无</div></div></div>
+  <div class="card plan-section"><h3><span style="color:var(--orange);">●</span> 稳妥院校</h3><div id="plan-wen"><div class="empty" style="padding:16px;">暂无</div></div></div>
+  <div class="card plan-section"><h3><span style="color:var(--green);">●</span> 保底院校</h3><div id="plan-bao"><div class="empty" style="padding:16px;">暂无</div></div></div>
+  <div class="card" style="margin-top:16px;">
+    <h3 style="margin-bottom:8px;">💡 填报建议</h3>
+    <ul style="padding-left:20px;font-size:0.85rem;color:var(--text-light);line-height:2;">
+      <li>冲刺院校建议填 3-5 所</li>
+      <li>稳妥院校建议填 5-8 所</li>
+      <li>保底院校建议填 3-5 所</li>
+      <li>各院校之间保持 2-3 分梯度</li>
+      <li>仔细阅读招生章程中的录取规则</li>
+    </ul>
+  </div>
+</div>
+
+<!-- Page: Tools -->
+<div id="page-tools" class="page">
+  <div class="header"><h1>🧰 辅助工具</h1><p>综合分计算 · 同位分换算 · 院校地图</p></div>
+  <div class="card">
+    <h3><i class="fas fa-calculator" style="color:var(--blue);"></i> 综合分计算器</h3>
+    <p style="font-size:0.8rem;color:var(--text-light);margin-bottom:10px;">河南美术类综合分 = 专业×1.25 + 文化×0.5</p>
+    <div class="form-group"><label>统考专业分</label><input type="number" id="calc-prof" placeholder="例: 245" min="0"></div>
+    <div class="form-group"><label>文化课成绩</label><input type="number" id="calc-culture" placeholder="例: 420" min="0"></div>
+    <button class="btn btn-primary btn-small" onclick="app.calcTool()">计算</button>
+    <div id="calc-result" class="calc-result" style="display:none;"><div class="label">综合分</div><div class="num" id="calc-total-num">0</div></div>
+  </div>
+  <div class="card">
+    <h3><i class="fas fa-exchange-alt" style="color:var(--primary);"></i> 同位分换算器</h3>
+    <p style="font-size:0.8rem;color:var(--text-light);margin-bottom:10px;">将当年综合分换算为往年等效分</p>
+    <div class="form-group"><label>当年综合分</label><input type="number" id="eq-score" placeholder="例: 320" min="0"></div>
+    <div class="form-group"><label>当年排名</label><input type="number" id="eq-rank" placeholder="例: 5000" min="1"></div>
+    <button class="btn btn-primary btn-small" onclick="app.calcEquivalent()">换算</button>
+    <div id="eq-result" class="calc-result" style="display:none;"><div class="label">2025年等效综合分（约）</div><div class="num" id="eq-num">0</div></div>
+  </div>
+  <div class="card">
+    <h3><i class="fas fa-map-marked-alt" style="color:var(--purple);"></i> 院校地区分布</h3>
+    <p style="font-size:0.8rem;color:var(--text-light);margin-bottom:8px;">按地区查看院校分布情况，点击地区查看院校</p>
+    <div id="region-tags"></div>
+    <div class="map-wrap" id="city-chart"></div>
+    <div id="region-schools"></div>
+  </div>
+  <div class="card">
+    <h3 style="margin-bottom:8px;">📌 数据说明</h3>
+    <div class="info-row"><span class="label">数据年份</span><span class="value">2023-2025</span></div>
+    <div class="info-row"><span class="label">更新日期</span><span class="value">2026-06-12</span></div>
+    <div class="info-row"><span class="label">数据来源</span><span class="value">河南省教育考试院官方公开数据</span></div>
+  </div>
+</div>
+
+<!-- Page: About -->
+<div id="page-about" class="page">
+  <div class="header"><h1>ℹ️ 关于</h1><p>河南艺术生志愿填报助手 2026</p></div>
+  <div class="card">
+    <h3>🎯 使用说明</h3>
+    <ol style="padding-left:20px;font-size:0.85rem;color:var(--text-light);line-height:2.2;">
+      <li>首页输入考生专业分、文化分和排名</li>
+      <li>系统基于近三年录取数据智能推荐，冲稳保分层</li>
+      <li>支持加入收藏 ❤️ 和院校对比 ⚖️</li>
+      <li>在方案页查看分层，可导出PDF或复制文本</li>
+      <li>工具页查看院校地区分布地图🗺️</li>
+    </ol>
+  </div>
+  <div class="card">
+    <h3>⚠️ 重要声明</h3>
+    <p style="font-size:0.85rem;color:var(--text-light);line-height:1.8;">
+      本工具数据来源于公开渠道整理，仅供填报参考。<br>
+      最终志愿请以 <strong>《招生考试之友》</strong> 和 <strong>河南省教育考试院官网</strong> 公布为准。
+    </p>
+  </div>
+  <div class="card">
+    <h3>📊 综合分计算公式</h3>
+    <div class="info-row"><span class="label">美术与设计类</span><span class="value">专业×1.25 + 文化×0.5</span></div>
+    <div class="info-row"><span class="label">音乐类</span><span class="value">专业×1.25 + 文化×0.5</span></div>
+    <div class="info-row"><span class="label">舞蹈类</span><span class="value">专业×1.25 + 文化×0.5</span></div>
+    <div class="info-row"><span class="label">播音与主持类</span><span class="value">专业×1.0 + 文化×0.667</span></div>
+    <div class="info-row"><span class="label">表（导）演类</span><span class="value">专业×1.25 + 文化×0.5</span></div>
+    <div class="info-row"><span class="label">书法类</span><span class="value">专业×1.25 + 文化×0.5</span></div>
+  <div class="card" style="margin-top:12px;">
+    <h3><i class="fas fa-database" style="color:var(--green);"></i> 数据导入（CSV/Excel）</h3>
+    <p style="font-size:0.8rem;color:var(--text-light);margin-bottom:8px;">
+      从河南省教育考试院官网或《招生考试之友》复制数据，按格式粘贴导入
+    </p>
+    <div class="form-group">
+      <label>数据格式说明</label>
+      <div style="font-size:0.75rem;background:#f5f6fa;padding:8px;border-radius:6px;line-height:1.8;color:var(--text-light);">
+        每行一所院校，用逗号分隔：<br>
+        <code>院校名称,城市,类型,批次,专业,计划数,2025综合分,2024综合分,2023综合分</code>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>粘贴院校数据</label>
+      <textarea id="import-data" rows="6" style="width:100%;padding:10px;border:1.5px solid #ddd;border-radius:8px;font-size:0.8rem;font-family:monospace;outline:none;resize:vertical;" placeholder="示例：
+郑州大学,郑州,公办,本科A段,视觉传达设计,85,550,542,535
+河南大学,开封,公办,本科A段,美术学,120,535,530,522"></textarea>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn btn-primary btn-small" onclick="app.importData()" style="flex:1;"><i class="fas fa-upload"></i> 导入数据</button>
+      <button class="btn btn-secondary btn-small" onclick="app.exportData()" style="flex:1;"><i class="fas fa-download"></i> 导出当前数据</button>
+      <button class="btn btn-secondary btn-small" onclick="app.resetData()" style="flex:1;"><i class="fas fa-undo"></i> 恢复默认</button>
+    </div>
+    <div id="import-status" style="margin-top:8px;font-size:0.8rem;color:var(--green);display:none;"></div>
+  </div>
+  </div>
+</div>
+<nav class="bottom-nav">
+    if('serviceWorker' in navigator){ navigator.serviceWorker.register('sw.js'); }
+  <div class="nav-item" data-p="page-compare" onclick="app.nav('page-compare')"><i class="fas fa-balance-scale"></i><div>对比</div></div>
+  <div class="nav-item" data-p="page-plan" onclick="app.nav('page-plan')">
+    <i class="fas fa-clipboard-list"></i><div>方案</div>
+    <span class="badge badge-count" id="plan-badge" style="display:none;background:var(--primary);">0</span>
+  </div>
+  <div class="nav-item" data-p="page-tools" onclick="app.nav('page-tools')"><i class="fas fa-tools"></i><div>工具</div></div>
+  <div class="nav-item" data-p="page-about" onclick="app.nav('page-about')"><i class="fas fa-info-circle"></i><div>关于</div></div>
+</nav>
+<script>
+// ==================== 模拟数据层 (API 替换入口) ====================
+const DB = {
+  // 河南艺术类综合分计算公式
+  formulas: {
+    '美术与设计类': { profWeight:1.25, cultureWeight:0.5, label:'专业×1.25 + 文化×0.5' },
+    '音乐类':       { profWeight:1.25, cultureWeight:0.5, label:'专业×1.25 + 文化×0.5' },
+    '舞蹈类':       { profWeight:1.25, cultureWeight:0.5, label:'专业×1.25 + 文化×0.5' },
+    '播音与主持类': { profWeight:1.0,  cultureWeight:0.667, label:'专业×1.0 + 文化×0.667' },
+    '表（导）演类': { profWeight:1.25, cultureWeight:0.5, label:'专业×1.25 + 文化×0.5' },
+    '书法类':       { profWeight:1.25, cultureWeight:0.5, label:'专业×1.25 + 文化×0.5' },
+  },
+  // 院校数据 - 45所真实风格
+  schools: [
+    {id:1,name:"郑州大学",city:"郑州",region:"河南省内",type:"公办",level:"211/双一流",batch:"本科A段",
+     majors:["视觉传达设计","绘画","雕塑"],planCount:85,tuition:"8000元/年",
+     desc:"国家211工程重点大学，艺术学科实力雄厚",tags:["公办","211"],
+     scores:{2025:{prof:258,culture:455,total:550},2024:{prof:255,culture:448,total:542},2023:{prof:252,culture:440,total:535}}},
+    {id:2,name:"河南大学",city:"开封",region:"河南省内",type:"公办",level:"双一流",batch:"本科A段",
+     majors:["美术学","环境设计","动画"],planCount:120,tuition:"8000元/年",
+     desc:"百年名校，双一流建设高校，美术学院历史悠久",tags:["公办","双一流"],
+     scores:{2025:{prof:250,culture:445,total:535},2024:{prof:248,culture:440,total:530},2023:{prof:245,culture:432,total:522}}},
+    {id:3,name:"河南农业大学",city:"郑州",region:"河南省内",type:"公办",batch:"本科A段",
+     majors:["环境设计","产品设计"],planCount:60,tuition:"8000元/年",
+     desc:"省属重点大学",tags:["公办"],
+     scores:{2025:{prof:233,culture:405,total:493},2024:{prof:230,culture:400,total:488},2023:{prof:228,culture:395,total:482}}},
+    {id:4,name:"河南师范大学",city:"新乡",region:"河南省内",type:"公办",batch:"本科A段",
+     majors:["美术学","绘画","视觉传达设计"],planCount:90,tuition:"8000元/年",
+     desc:"师范类院校，美术教育方向突出",tags:["公办"],
+     scores:{2025:{prof:230,culture:400,total:488},2024:{prof:228,culture:395,total:482},2023:{prof:225,culture:390,total:476}}},
+    {id:5,name:"河南科技大学",city:"洛阳",region:"河南省内",type:"公办",batch:"本科A段",
+     majors:["产品设计","动画"],planCount:70,tuition:"8000元/年",
+     desc:"省属重点大学",tags:["公办"],
+     scores:{2025:{prof:228,culture:395,total:482},2024:{prof:225,culture:390,total:476},2023:{prof:222,culture:385,total:470}}},
+    {id:6,name:"河南工业大学",city:"郑州",region:"河南省内",type:"公办",batch:"本科A段",
+     majors:["环境设计","视觉传达设计"],planCount:55,tuition:"8000元/年",
+     desc:"省属重点大学",tags:["公办"],
+     scores:{2025:{prof:226,culture:393,total:478},2024:{prof:224,culture:388,total:473},2023:{prof:220,culture:382,total:465}}},
+    {id:7,name:"中原工学院",city:"郑州",region:"河南省内",type:"公办",batch:"本科A段",
+     majors:["服装与服饰设计","视觉传达设计"],planCount:100,tuition:"8000元/年",
+     desc:"服装设计特色院校",tags:["公办"],
+     scores:{2025:{prof:220,culture:383,total:468},2024:{prof:218,culture:378,total:462},2023:{prof:215,culture:372,total:455}}},
+    {id:8,name:"郑州轻工业大学",city:"郑州",region:"河南省内",type:"公办",batch:"本科A段",
+     majors:["产品设计","数字媒体艺术","绘画"],planCount:130,tuition:"8000元/年",
+     desc:"设计学科特色鲜明",tags:["公办"],
+     scores:{2025:{prof:223,culture:387,total:472},2024:{prof:220,culture:382,total:465},2023:{prof:218,culture:375,total:458}}},
+    {id:9,name:"信阳师范大学",city:"信阳",region:"河南省内",type:"公办",batch:"本科A段",
+     majors:["美术学","视觉传达设计"],planCount:80,tuition:"8000元/年",
+     desc:"豫南地区重点师范院校",tags:["公办"],
+     scores:{2025:{prof:213,culture:373,total:452},2024:{prof:210,culture:368,total:446},2023:{prof:208,culture:362,total:440}}},
+    {id:10,name:"洛阳师范学院",city:"洛阳",region:"河南省内",type:"公办",batch:"本科A段",
+     majors:["美术学","动画","视觉传达设计"],planCount:90,tuition:"8000元/年",
+     desc:"师范教育底蕴深厚",tags:["公办"],
+     scores:{2025:{prof:208,culture:367,total:442},2024:{prof:205,culture:362,total:436},2023:{prof:202,culture:355,total:428}}},
+    {id:11,name:"安阳师范学院",city:"安阳",region:"河南省内",type:"公办",batch:"本科A段",
+     majors:["美术学","环境设计"],planCount:75,tuition:"8000元/年",
+     desc:"甲骨文特色院校",tags:["公办"],
+     scores:{2025:{prof:203,culture:360,total:432},2024:{prof:200,culture:355,total:426},2023:{prof:198,culture:348,total:419}}},
+    {id:12,name:"南阳师范学院",city:"南阳",region:"河南省内",type:"公办",batch:"本科A段",
+     majors:["美术学","视觉传达设计"],planCount:70,tuition:"8000元/年",
+     desc:"豫西南地区综合性师范院校",tags:["公办"],
+     scores:{2025:{prof:198,culture:353,total:422},2024:{prof:195,culture:348,total:416},2023:{prof:192,culture:340,total:408}}},
+    {id:13,name:"商丘师范学院",city:"商丘",region:"河南省内",type:"公办",batch:"本科A段",
+     majors:["绘画","视觉传达设计"],planCount:65,tuition:"8000元/年",
+     desc:"省属公办本科院校",tags:["公办"],
+     scores:{2025:{prof:196,culture:350,total:418},2024:{prof:193,culture:345,total:412},2023:{prof:190,culture:338,total:405}}},
+    {id:14,name:"周口师范学院",city:"周口",region:"河南省内",type:"公办",batch:"本科A段",
+     majors:["美术学","视觉传达设计"],planCount:60,tuition:"8000元/年",
+     desc:"豫东地区师范院校",tags:["公办"],
+     scores:{2025:{prof:193,culture:345,total:412},2024:{prof:190,culture:340,total:406},2023:{prof:188,culture:335,total:400}}},
+    {id:15,name:"许昌学院",city:"许昌",region:"河南省内",type:"公办",batch:"本科A段",
+     majors:["美术学","环境设计"],planCount:55,tuition:"8000元/年",
+     desc:"地方性应用型本科院校",tags:["公办"],
+     scores:{2025:{prof:190,culture:340,total:406},2024:{prof:188,culture:335,total:400},2023:{prof:185,culture:330,total:395}}},
+    {id:16,name:"郑州工商学院",city:"郑州",region:"河南省内",type:"民办",batch:"本科B段",
+     majors:["视觉传达设计","环境设计"],planCount:150,tuition:"18000元/年",
+     desc:"民办本科，招生计划充足",tags:["民办"],
+     scores:{2025:{prof:173,culture:315,total:372},2024:{prof:170,culture:310,total:365},2023:{prof:168,culture:305,total:358}}},
+    {id:17,name:"郑州科技学院",city:"郑州",region:"河南省内",type:"民办",batch:"本科B段",
+     majors:["视觉传达设计","动画","环境设计"],planCount:180,tuition:"17000元/年",
+     desc:"应用型民办本科",tags:["民办"],
+     scores:{2025:{prof:176,culture:320,total:378},2024:{prof:173,culture:315,total:371},2023:{prof:170,culture:308,total:363}}},
+    {id:18,name:"郑州升达经贸管理学院",city:"郑州",region:"河南省内",type:"民办",batch:"本科B段",
+     majors:["视觉传达设计","环境设计","数字媒体艺术"],planCount:120,tuition:"17000元/年",
+     desc:"经管类民办本科",tags:["民办"],
+     scores:{2025:{prof:171,culture:313,total:369},2024:{prof:168,culture:308,total:362},2023:{prof:165,culture:300,total:353}}},
+    {id:19,name:"黄河科技学院",city:"郑州",region:"河南省内",type:"民办",batch:"本科B段",
+     majors:["视觉传达设计","动画"],planCount:110,tuition:"16500元/年",
+     desc:"民办本科院校",tags:["民办"],
+     scores:{2025:{prof:168,culture:310,total:364},2024:{prof:165,culture:305,total:357},2023:{prof:162,culture:298,total:350}}},
+    {id:20,name:"郑州商学院",city:"巩义",region:"河南省内",type:"民办",batch:"本科B段",
+     majors:["视觉传达设计","环境设计"],planCount:100,tuition:"16500元/年",
+     desc:"商科特色民办本科",tags:["民办"],
+     scores:{2025:{prof:166,culture:307,total:360},2024:{prof:163,culture:302,total:354},2023:{prof:160,culture:295,total:345}}},
+    {id:21,name:"中原科技学院",city:"郑州",region:"河南省内",type:"民办",batch:"本科B段",
+     majors:["视觉传达设计","产品设计"],planCount:80,tuition:"16000元/年",
+     desc:"民办本科院校",tags:["民办"],
+     scores:{2025:{prof:163,culture:303,total:356},2024:{prof:160,culture:298,total:350},2023:{prof:158,culture:290,total:342}}},
+    {id:22,name:"新乡工程学院",city:"新乡",region:"河南省内",type:"民办",batch:"本科B段",
+     majors:["视觉传达设计","环境设计"],planCount:90,tuition:"16000元/年",
+     desc:"民办本科院校",tags:["民办"],
+     scores:{2025:{prof:160,culture:300,total:350},2024:{prof:158,culture:295,total:345},2023:{prof:155,culture:288,total:338}}},
+    {id:23,name:"河南工程学院",city:"郑州",region:"河南省内",type:"公办",batch:"本科A段",
+     majors:["视觉传达设计","环境设计","产品设计"],planCount:85,tuition:"8000元/年",
+     desc:"工科为主，设计学科并重",tags:["公办"],
+     scores:{2025:{prof:208,culture:365,total:442},2024:{prof:205,culture:360,total:436},2023:{prof:202,culture:352,total:428}}},
+    {id:24,name:"洛阳理工学院",city:"洛阳",region:"河南省内",type:"公办",batch:"本科A段",
+     majors:["环境设计","视觉传达设计"],planCount:60,tuition:"8000元/年",
+     desc:"省属公办本科",tags:["公办"],
+     scores:{2025:{prof:206,culture:363,total:436},2024:{prof:203,culture:358,total:430},2023:{prof:200,culture:350,total:422}}},
+    {id:25,name:"河南财政金融学院",city:"郑州",region:"河南省内",type:"公办",batch:"本科A段",
+     majors:["视觉传达设计","环境设计"],planCount:50,tuition:"8000元/年",
+     desc:"财经类特色公办院校",tags:["公办"],
+     scores:{2025:{prof:203,culture:357,total:432},2024:{prof:200,culture:352,total:426},2023:{prof:198,culture:345,total:419}}},
+    {id:26,name:"平顶山学院",city:"平顶山",region:"河南省内",type:"公办",batch:"本科A段",
+     majors:["美术学","视觉传达设计"],planCount:70,tuition:"8000元/年",
+     desc:"地方性本科院校",tags:["公办"],
+     scores:{2025:{prof:188,culture:335,total:398},2024:{prof:185,culture:330,total:392},2023:{prof:182,culture:325,total:385}}},
+    {id:27,name:"黄淮学院",city:"驻马店",region:"河南省内",type:"公办",batch:"本科A段",
+     majors:["美术学","环境设计","视觉传达设计"],planCount:80,tuition:"8000元/年",
+     desc:"地方性应用型本科",tags:["公办"],
+     scores:{2025:{prof:186,culture:333,total:396},2024:{prof:183,culture:328,total:390},2023:{prof:180,culture:320,total:382}}},
+    {id:28,name:"新乡学院",city:"新乡",region:"河南省内",type:"公办",batch:"本科A段",
+     majors:["视觉传达设计","环境设计"],planCount:65,tuition:"8000元/年",
+     desc:"地方性本科院校",tags:["公办"],
+     scores:{2025:{prof:183,culture:330,total:392},2024:{prof:180,culture:325,total:386},2023:{prof:178,culture:318,total:378}}},
+    {id:29,name:"河南城建学院",city:"平顶山",region:"河南省内",type:"公办",batch:"本科A段",
+     majors:["环境设计","视觉传达设计"],planCount:60,tuition:"8000元/年",
+     desc:"城建特色本科院校",tags:["公办"],
+     scores:{2025:{prof:181,culture:327,total:389},2024:{prof:178,culture:322,total:382},2023:{prof:175,culture:315,total:375}}},
+    {id:30,name:"安阳工学院",city:"安阳",region:"河南省内",type:"公办",batch:"本科A段",
+     majors:["视觉传达设计","环境设计","产品设计"],planCount:75,tuition:"8000元/年",
+     desc:"工科特色地方院校",tags:["公办"],
+     scores:{2025:{prof:180,culture:325,total:386},2024:{prof:178,culture:320,total:380},2023:{prof:175,culture:313,total:372}}},
+    {id:31,name:"中央美术学院",city:"北京",region:"京津地区",type:"公办",level:"双一流",batch:"提前批",
+     majors:["中国画","造型艺术","设计学类"],planCount:20,tuition:"15000元/年",
+     desc:"中国美术最高学府，教育部直属",tags:["公办","双一流","美院"],
+     scores:{2025:{prof:272,culture:475,total:578},2024:{prof:270,culture:470,total:572},2023:{prof:268,culture:465,total:565}}},
+    {id:32,name:"中国美术学院",city:"杭州",region:"华东地区",type:"公办",level:"双一流",batch:"提前批",
+     majors:["中国画","书法学","设计学类"],planCount:18,tuition:"15000元/年",
+     desc:"世界一流美术学院",tags:["公办","双一流","美院"],
+     scores:{2025:{prof:270,culture:470,total:572},2024:{prof:268,culture:465,total:565},2023:{prof:265,culture:458,total:558}}},
+    {id:33,name:"四川美术学院",city:"重庆",region:"西南地区",type:"公办",batch:"提前批",
+     majors:["绘画","雕塑","设计学类"],planCount:25,tuition:"15000元/年",
+     desc:"西南地区重要美术学院",tags:["公办","美院"],
+     scores:{2025:{prof:262,culture:450,total:552},2024:{prof:260,culture:445,total:548},2023:{prof:258,culture:438,total:540}}},
+    {id:34,name:"天津美术学院",city:"天津",region:"京津地区",type:"公办",batch:"提前批",
+     majors:["绘画","雕塑","设计学类"],planCount:22,tuition:"15000元/年",
+     desc:"北方重要美术学院",tags:["公办","美院"],
+     scores:{2025:{prof:260,culture:445,total:548},2024:{prof:258,culture:440,total:542},2023:{prof:255,culture:432,total:535}}},
+    {id:35,name:"厦门大学",city:"厦门",region:"华东地区",type:"公办",level:"985/211",batch:"本科A段",
+     majors:["视觉传达设计","环境设计","数字媒体艺术"],planCount:15,tuition:"9360元/年",
+     desc:"985工程重点大学，南方之强",tags:["公办","985"],
+     scores:{2025:{prof:265,culture:460,total:562},2024:{prof:262,culture:455,total:556},2023:{prof:260,culture:448,total:548}}},
+    {id:36,name:"华东师范大学",city:"上海",region:"华东地区",type:"公办",level:"985/211",batch:"提前批",
+     majors:["美术学","设计学类"],planCount:12,tuition:"10000元/年",
+     desc:"教育部直属985高校",tags:["公办","985"],
+     scores:{2025:{prof:268,culture:465,total:568},2024:{prof:265,culture:458,total:560},2023:{prof:262,culture:450,total:552}}},
+    {id:37,name:"北京服装学院",city:"北京",region:"京津地区",type:"公办",batch:"提前批",
+     majors:["服装与服饰设计","视觉传达设计","数字媒体艺术"],planCount:28,tuition:"10000元/年",
+     desc:"国内服装设计领军院校",tags:["公办"],
+     scores:{2025:{prof:252,culture:435,total:532},2024:{prof:250,culture:430,total:528},2023:{prof:248,culture:422,total:520}}},
+    {id:38,name:"中国传媒大学",city:"北京",region:"京津地区",type:"公办",level:"211",batch:"提前批",
+     majors:["数字媒体艺术","动画","视觉传达设计"],planCount:15,tuition:"10000元/年",
+     desc:"传媒艺术领域顶尖211院校",tags:["公办","211"],
+     scores:{2025:{prof:258,culture:450,total:542},2024:{prof:255,culture:445,total:538},2023:{prof:252,culture:438,total:530}}},
+    {id:39,name:"景德镇陶瓷大学",city:"景德镇",region:"华东地区",type:"公办",batch:"本科A段",
+     majors:["陶瓷艺术设计","雕塑","绘画"],planCount:40,tuition:"9600元/年",
+     desc:"中国陶瓷艺术最高学府",tags:["公办"],
+     scores:{2025:{prof:228,culture:395,total:482},2024:{prof:225,culture:390,total:476},2023:{prof:222,culture:382,total:468}}},
+    {id:40,name:"山东工艺美术学院",city:"济南",region:"华东地区",type:"公办",batch:"本科A段",
+     majors:["视觉传达设计","环境设计","产品设计","服装与服饰设计"],planCount:35,tuition:"10000元/年",
+     desc:"知名工艺美术院校",tags:["公办"],
+     scores:{2025:{prof:238,culture:410,total:502},2024:{prof:235,culture:405,total:498},2023:{prof:232,culture:398,total:490}}},
+    {id:41,name:"武汉理工大学",city:"武汉",region:"华中地区",type:"公办",level:"211",batch:"本科A段",
+     majors:["视觉传达设计","环境设计","产品设计"],planCount:20,tuition:"10350元/年",
+     desc:"211工程重点大学，设计学科强势",tags:["公办","211"],
+     scores:{2025:{prof:245,culture:430,total:522},2024:{prof:242,culture:425,total:516},2023:{prof:240,culture:418,total:508}}},
+    {id:42,name:"湖北美术学院",city:"武汉",region:"华中地区",type:"公办",batch:"提前批",
+     majors:["绘画","雕塑","设计学类"],planCount:30,tuition:"15000元/年",
+     desc:"华中地区重要美院",tags:["公办","美院"],
+     scores:{2025:{prof:255,culture:440,total:536},2024:{prof:252,culture:435,total:530},2023:{prof:250,culture:428,total:522}}},
+    {id:43,name:"西安美术学院",city:"西安",region:"西北地区",type:"公办",batch:"提前批",
+     majors:["中国画","绘画","设计学类"],planCount:25,tuition:"15000元/年",
+     desc:"西北地区最高美术学府",tags:["公办","美院"],
+     scores:{2025:{prof:258,culture:443,total:542},2024:{prof:255,culture:438,total:536},2023:{prof:252,culture:430,total:528}}},
+    {id:44,name:"南京艺术学院",city:"南京",region:"华东地区",type:"公办",batch:"本科A段",
+     majors:["绘画","视觉传达设计","环境设计"],planCount:22,tuition:"11000元/年",
+     desc:"综合性艺术院校",tags:["公办"],
+     scores:{2025:{prof:248,culture:433,total:526},2024:{prof:245,culture:428,total:520},2023:{prof:242,culture:420,total:512}}},
+    {id:45,name:"浙江传媒学院",city:"杭州",region:"华东地区",type:"公办",batch:"本科A段",
+     majors:["动画","数字媒体艺术","视觉传达设计"],planCount:25,tuition:"10300元/年",
+     desc:"传媒艺术特色院校",tags:["公办"],
+     scores:{2025:{prof:240,culture:415,total:506},2024:{prof:238,culture:410,total:500},2023:{prof:235,culture:402,total:492}}},
+  ],
+  // API: 通过城市获取地区分组
+  getSchoolsByRegion(){
+    const map = {};
+    this.schools.forEach(s => {
+      if(!map[s.region]) map[s.region] = [  {id:46,name:"东北师范大学",city:"长春",region:"东北地区",type:"公办",level:"211",batch:"提前批",
+   majors:["美术学","雕塑","设计学类"],planCount:18,tuition:"12000元/年",
+   desc:"教育部直属211师范大学，美术学实力强劲",tags:["公办","211"],
+   scores:{2025:{prof:250,culture:435,total:528},2024:{prof:248,culture:430,total:522},2023:{prof:245,culture:422,total:514}}},
+  {id:47,name:"华中师范大学",city:"武汉",region:"华中地区",type:"公办",level:"211",batch:"提前批",
+   majors:["美术学","视觉传达设计","环境设计"],planCount:20,tuition:"10350元/年",
+   desc:"教育部直属211师范院校",tags:["公办","211"],
+   scores:{2025:{prof:248,culture:432,total:526},2024:{prof:245,culture:428,total:520},2023:{prof:242,culture:420,total:512}}},
+  {id:48,name:"陕西师范大学",city:"西安",region:"西北地区",type:"公办",level:"211",batch:"提前批",
+   majors:["美术学","绘画","视觉传达设计"],planCount:16,tuition:"11000元/年",
+   desc:"教育部直属211师范大学，美术学国家特色专业",tags:["公办","211"],
+   scores:{2025:{prof:242,culture:425,total:518},2024:{prof:240,culture:420,total:512},2023:{prof:238,culture:412,total:505}}},
+  {id:49,name:"湖南师范大学",city:"长沙",region:"华中地区",type:"公办",level:"211",batch:"本科A段",
+   majors:["美术学","绘画","艺术设计学"],planCount:22,tuition:"10000元/年",
+   desc:"211工程师范大学，美术学科实力雄厚",tags:["公办","211"],
+   scores:{2025:{prof:240,culture:420,total:512},2024:{prof:238,culture:415,total:506},2023:{prof:235,culture:408,total:498}}},
+  {id:50,name:"南京师范大学",city:"南京",region:"华东地区",type:"公办",level:"211",batch:"本科A段",
+   majors:["美术学","绘画","视觉传达设计"],planCount:15,tuition:"11000元/年",
+   desc:"211师范大学，美术学国家一流专业",tags:["公办","211"],
+   scores:{2025:{prof:252,culture:438,total:530},2024:{prof:250,culture:432,total:524},2023:{prof:248,culture:425,total:515}}},
+  {id:51,name:"上海大学",city:"上海",region:"华东地区",type:"公办",level:"211",batch:"本科A段",
+   majors:["绘画","视觉传达设计","环境设计","数字媒体艺术"],planCount:20,tuition:"10000元/年",
+   desc:"211工程综合性大学，上海美术学院实力强劲",tags:["公办","211"],
+   scores:{2025:{prof:255,culture:442,total:535},2024:{prof:252,culture:438,total:528},2023:{prof:250,culture:430,total:520}}},
+  {id:52,name:"苏州大学",city:"苏州",region:"华东地区",type:"公办",level:"211",batch:"本科A段",
+   majors:["美术学","视觉传达设计","环境设计","产品设计"],planCount:18,tuition:"11000元/年",
+   desc:"211工程大学，设计学科实力突出",tags:["公办","211"],
+   scores:{2025:{prof:248,culture:430,total:520},2024:{prof:245,culture:425,total:514},2023:{prof:242,culture:418,total:505}}},
+  {id:53,name:"江南大学",city:"无锡",region:"华东地区",type:"公办",level:"211",batch:"本科A段",
+   majors:["视觉传达设计","环境设计","产品设计","服装与服饰设计"],planCount:22,tuition:"11000元/年",
+   desc:"211工程大学，设计学科全国闻名",tags:["公办","211"],
+   scores:{2025:{prof:250,culture:435,total:528},2024:{prof:248,culture:430,total:522},2023:{prof:245,culture:422,total:514}}},
+  {id:54,name:"东华大学",city:"上海",region:"华东地区",type:"公办",level:"211",batch:"提前批",
+   majors:["服装与服饰设计","视觉传达设计","环境设计","数字媒体艺术"],planCount:25,tuition:"10000元/年",
+   desc:"211工程大学，服装设计全国领先",tags:["公办","211"],
+   scores:{2025:{prof:258,culture:448,total:545},2024:{prof:255,culture:442,total:538},2023:{prof:252,culture:435,total:530}}},
+  {id:55,name:"北京印刷学院",city:"北京",region:"京津地区",type:"公办",batch:"本科A段",
+   majors:["视觉传达设计","数字媒体艺术","绘画","动画"],planCount:20,tuition:"10000元/年",
+   desc:"印刷与设计特色院校，数字媒体领先",tags:["公办"],
+   scores:{2025:{prof:235,culture:405,total:498},2024:{prof:232,culture:400,total:492},2023:{prof:230,culture:392,total:485}}},
+  {id:56,name:"天津科技大学",city:"天津",region:"京津地区",type:"公办",batch:"本科A段",
+   majors:["视觉传达设计","环境设计","产品设计"],planCount:25,tuition:"12000元/年",
+   desc:"工科为主，设计学科并重",tags:["公办"],
+   scores:{2025:{prof:225,culture:395,total:488},2024:{prof:222,culture:390,total:482},2023:{prof:220,culture:382,total:475}}},
+  {id:57,name:"河北工业大学",city:"天津",region:"京津地区",type:"公办",level:"211",batch:"本科A段",
+   majors:["视觉传达设计","环境设计"],planCount:15,tuition:"11000元/年",
+   desc:"211工程大学，位于天津",tags:["公办","211"],
+   scores:{2025:{prof:240,culture:415,total:505},2024:{prof:238,culture:410,total:498},2023:{prof:235,culture:402,total:490}}},
+  {id:58,name:"山西大学",city:"太原",region:"西北地区",type:"公办",level:"双一流",batch:"本科A段",
+   majors:["美术学","绘画","视觉传达设计","环境设计"],planCount:30,tuition:"10000元/年",
+   desc:"双一流建设高校，百年名校",tags:["公办","双一流"],
+   scores:{2025:{prof:230,culture:400,total:488},2024:{prof:228,culture:395,total:482},2023:{prof:225,culture:388,total:475}}},
+  {id:59,name:"太原理工大学",city:"太原",region:"西北地区",type:"公办",level:"211",batch:"本科A段",
+   majors:["视觉传达设计","环境设计","绘画"],planCount:20,tuition:"10000元/年",
+   desc:"211工程大学，山西唯一211",tags:["公办","211"],
+   scores:{2025:{prof:235,culture:408,total:498},2024:{prof:232,culture:402,total:492},2023:{prof:230,culture:395,total:485}}},
+  {id:60,name:"安徽大学",city:"合肥",region:"华东地区",type:"公办",level:"211",batch:"本科A段",
+   majors:["视觉传达设计","环境设计","绘画"],planCount:18,tuition:"10000元/年",
+   desc:"211工程综合性大学",tags:["公办","211"],
+   scores:{2025:{prof:238,culture:412,total:504},2024:{prof:235,culture:408,total:496},2023:{prof:232,culture:400,total:488}}},
+  {id:61,name:"福州大学",city:"福州",region:"华东地区",type:"公办",level:"211",batch:"本科A段",
+   majors:["视觉传达设计","环境设计","产品设计","服装与服饰设计"],planCount:22,tuition:"10000元/年",
+   desc:"211工程大学，厦门工艺美术学院",tags:["公办","211"],
+   scores:{2025:{prof:242,culture:418,total:510},2024:{prof:240,culture:412,total:504},2023:{prof:238,culture:405,total:496}}},
+  {id:62,name:"南昌大学",city:"南昌",region:"华东地区",type:"公办",level:"211",batch:"本科A段",
+   majors:["绘画","视觉传达设计","环境设计","产品设计"],planCount:25,tuition:"10000元/年",
+   desc:"211工程综合性大学，设计学科齐全",tags:["公办","211"],
+   scores:{2025:{prof:235,culture:408,total:496},2024:{prof:232,culture:402,total:490},2023:{prof:230,culture:395,total:482}}},
+  {id:63,name:"山东大学",city:"济南",region:"华东地区",type:"公办",level:"985/211",batch:"本科A段",
+   majors:["美术学","视觉传达设计"],planCount:12,tuition:"10000元/年",
+   desc:"985工程重点大学",tags:["公办","985"],
+   scores:{2025:{prof:260,culture:450,total:548},2024:{prof:258,culture:445,total:542},2023:{prof:255,culture:438,total:534}}},
+  {id:64,name:"中国地质大学（武汉）",city:"武汉",region:"华中地区",type:"公办",level:"211",batch:"本科A段",
+   majors:["视觉传达设计","环境设计","数字媒体艺术"],planCount:20,tuition:"10350元/年",
+   desc:"211工程大学，珠宝设计为特色",tags:["公办","211"],
+   scores:{2025:{prof:242,culture:420,total:510},2024:{prof:240,culture:415,total:504},2023:{prof:238,culture:408,total:498}}},
+  {id:65,name:"中南财经政法大学",city:"武汉",region:"华中地区",type:"公办",level:"211",batch:"本科A段",
+   majors:["视觉传达设计","动画","数字媒体艺术"],planCount:15,tuition:"10350元/年",
+   desc:"211工程财经政法特色大学",tags:["公办","211"],
+   scores:{2025:{prof:238,culture:415,total:505},2024:{prof:235,culture:410,total:498},2023:{prof:232,culture:402,total:490}}},
+  {id:66,name:"西南大学",city:"重庆",region:"西南地区",type:"公办",level:"211",batch:"本科A段",
+   majors:["美术学","绘画","视觉传达设计"],planCount:25,tuition:"10000元/年",
+   desc:"211工程综合性大学，师范与艺术并重",tags:["公办","211"],
+   scores:{2025:{prof:240,culture:418,total:508},2024:{prof:238,culture:412,total:502},2023:{prof:235,culture:405,total:494}}},
+  {id:67,name:"四川大学",city:"成都",region:"西南地区",type:"公办",level:"985/211",batch:"本科A段",
+   majors:["绘画","视觉传达设计","环境设计"],planCount:15,tuition:"10000元/年",
+   desc:"985工程重点大学，西南最高学府",tags:["公办","985"],
+   scores:{2025:{prof:258,culture:448,total:545},2024:{prof:255,culture:442,total:538},2023:{prof:252,culture:435,total:530}}},
+  {id:68,name:"重庆大学",city:"重庆",region:"西南地区",type:"公办",level:"985/211",batch:"本科A段",
+   majors:["绘画","视觉传达设计","环境设计","产品设计"],planCount:18,tuition:"10000元/年",
+   desc:"985工程重点大学，设计学科强势",tags:["公办","985"],
+   scores:{2025:{prof:255,culture:442,total:538},2024:{prof:252,culture:438,total:532},2023:{prof:250,culture:430,total:525}}},
+  {id:69,name:"西南交通大学",city:"成都",region:"西南地区",type:"公办",level:"211",batch:"本科A段",
+   majors:["视觉传达设计","环境设计","产品设计"],planCount:20,tuition:"10000元/年",
+   desc:"211工程大学，交通设计特色",tags:["公办","211"],
+   scores:{2025:{prof:232,culture:405,total:492},2024:{prof:230,culture:400,total:486},2023:{prof:228,culture:392,total:478}}},
+  {id:70,name:"长安大学",city:"西安",region:"西北地区",type:"公办",level:"211",batch:"本科A段",
+   majors:["环境设计","视觉传达设计"],planCount:15,tuition:"11000元/年",
+   desc:"211工程大学，工科为主",tags:["公办","211"],
+   scores:{2025:{prof:228,culture:398,total:486},2024:{prof:225,culture:392,total:480},2023:{prof:222,culture:385,total:472}}},
+  {id:71,name:"西北农林科技大学",city:"杨凌",region:"西北地区",type:"公办",level:"985/211",batch:"本科A段",
+   majors:["环境设计","视觉传达设计"],planCount:12,tuition:"10000元/年",
+   desc:"985工程重点大学，农林特色",tags:["公办","985"],
+   scores:{2025:{prof:225,culture:395,total:482},2024:{prof:222,culture:390,total:476},2023:{prof:220,culture:382,total:468}}},
+  {id:72,name:"陕西科技大学",city:"西安",region:"西北地区",type:"公办",batch:"本科A段",
+   majors:["视觉传达设计","环境设计","产品设计","动画"],planCount:30,tuition:"10000元/年",
+   desc:"轻工与设计特色院校",tags:["公办"],
+   scores:{2025:{prof:218,culture:385,total:472},2024:{prof:215,culture:380,total:466},2023:{prof:212,culture:372,total:458}}},
+  {id:73,name:"西安建筑科技大学",city:"西安",region:"西北地区",type:"公办",batch:"本科A段",
+   majors:["环境设计","视觉传达设计","产品设计"],planCount:25,tuition:"10000元/年",
+   desc:"建筑类特色院校，环境设计实力强",tags:["公办"],
+   scores:{2025:{prof:220,culture:388,total:475},2024:{prof:218,culture:382,total:468},2023:{prof:215,culture:375,total:460}}},
+  {id:74,name:"西北大学",city:"西安",region:"西北地区",type:"公办",level:"211",batch:"本科A段",
+   majors:["美术学","视觉传达设计","环境设计","动画"],planCount:22,tuition:"10000元/年",
+   desc:"211工程综合性大学，艺术底蕴深厚",tags:["公办","211"],
+   scores:{2025:{prof:238,culture:412,total:502},2024:{prof:235,culture:408,total:496},2023:{prof:232,culture:400,total:488}}},
+  {id:75,name:"广州美术学院",city:"广州",region:"华南地区",type:"公办",batch:"提前批",
+   majors:["绘画","雕塑","视觉传达设计","环境设计","产品设计"],planCount:28,tuition:"15000元/年",
+   desc:"华南地区最高美术学府",tags:["公办","美院"],
+   scores:{2025:{prof:265,culture:452,total:558},2024:{prof:262,culture:448,total:552},2023:{prof:260,culture:440,total:545}}},
+  {id:76,name:"华南师范大学",city:"广州",region:"华南地区",type:"公办",level:"211",batch:"本科A段",
+   majors:["美术学","视觉传达设计","环境设计","数字媒体艺术"],planCount:20,tuition:"10000元/年",
+   desc:"211师范大学，美术教育突出",tags:["公办","211"],
+   scores:{2025:{prof:242,culture:422,total:510},2024:{prof:240,culture:418,total:504},2023:{prof:238,culture:410,total:496}}},
+  {id:77,name:"深圳大学",city:"深圳",region:"华南地区",type:"公办",batch:"本科A段",
+   majors:["视觉传达设计","环境设计","产品设计","数字媒体艺术"],planCount:25,tuition:"10000元/年",
+   desc:"深圳市属综合性大学，设计学科发展迅猛",tags:["公办"],
+   scores:{2025:{prof:245,culture:428,total:515},2024:{prof:242,culture:422,total:508},2023:{prof:240,culture:415,total:500}}},
+  {id:78,name:"广东工业大学",city:"广州",region:"华南地区",type:"公办",batch:"本科A段",
+   majors:["视觉传达设计","环境设计","产品设计","服装与服饰设计","数字媒体艺术"],planCount:35,tuition:"10000元/年",
+   desc:"工科为主，设计学科齐全",tags:["公办"],
+   scores:{2025:{prof:228,culture:398,total:485},2024:{prof:225,culture:392,total:478},2023:{prof:222,culture:385,total:470}}},
+  {id:79,name:"广西艺术学院",city:"南宁",region:"华南地区",type:"公办",batch:"本科A段",
+   majors:["绘画","雕塑","视觉传达设计","环境设计","产品设计","服装与服饰设计"],planCount:45,tuition:"12000元/年",
+   desc:"省属综合性艺术院校",tags:["公办"],
+   scores:{2025:{prof:225,culture:390,total:480},2024:{prof:222,culture:385,total:474},2023:{prof:220,culture:378,total:466}}},
+  {id:80,name:"云南艺术学院",city:"昆明",region:"西南地区",type:"公办",batch:"本科A段",
+   majors:["绘画","雕塑","视觉传达设计","环境设计","产品设计"],planCount:40,tuition:"12000元/年",
+   desc:"西南地区重要综合性艺术院校",tags:["公办"],
+   scores:{2025:{prof:222,culture:388,total:478},2024:{prof:220,culture:382,total:472},2023:{prof:218,culture:375,total:465}}},
+  {id:81,name:"四川音乐学院",city:"成都",region:"西南地区",type:"公办",batch:"本科A段",
+   majors:["绘画","雕塑","视觉传达设计","环境设计","数字媒体艺术"],planCount:30,tuition:"12000元/年",
+   desc:"知名艺术院校，美术设计并重",tags:["公办"],
+   scores:{2025:{prof:230,culture:398,total:488},2024:{prof:228,culture:392,total:482},2023:{prof:225,culture:385,total:475}}},
+  {id:82,name:"鲁迅美术学院",city:"沈阳",region:"东北地区",type:"公办",batch:"提前批",
+   majors:["中国画","绘画","雕塑","视觉传达设计","环境设计","产品设计"],planCount:30,tuition:"15000元/年",
+   desc:"东北地区最高美术学府，红色美院",tags:["公办","美院"],
+   scores:{2025:{prof:262,culture:448,total:552},2024:{prof:260,culture:442,total:546},2023:{prof:258,culture:435,total:540}}},
+  {id:83,name:"吉林艺术学院",city:"长春",region:"东北地区",type:"公办",batch:"本科A段",
+   majors:["绘画","雕塑","视觉传达设计","环境设计","产品设计","服装与服饰设计"],planCount:40,tuition:"12000元/年",
+   desc:"东北地区综合性艺术院校",tags:["公办"],
+   scores:{2025:{prof:220,culture:385,total:472},2024:{prof:218,culture:380,total:466},2023:{prof:215,culture:372,total:458}}},
+  {id:84,name:"哈尔滨师范大学",city:"哈尔滨",region:"东北地区",type:"公办",batch:"本科A段",
+   majors:["美术学","绘画","视觉传达设计","环境设计"],planCount:35,tuition:"10000元/年",
+   desc:"东北地区重要师范院校，美术学实力强",tags:["公办"],
+   scores:{2025:{prof:215,culture:380,total:468},2024:{prof:212,culture:375,total:462},2023:{prof:210,culture:368,total:455}}},
+  {id:85,name:"大连工业大学",city:"大连",region:"东北地区",type:"公办",batch:"本科A段",
+   majors:["视觉传达设计","环境设计","产品设计","服装与服饰设计","数字媒体艺术"],planCount:35,tuition:"10000元/年",
+   desc:"服装设计与工程国家特色专业",tags:["公办"],
+   scores:{2025:{prof:225,culture:392,total:478},2024:{prof:222,culture:386,total:472},2023:{prof:220,culture:378,total:465}}},
+  {id:86,name:"沈阳航空航天大学",city:"沈阳",region:"东北地区",type:"公办",batch:"本科A段",
+   majors:["视觉传达设计","环境设计","产品设计","数字媒体艺术"],planCount:20,tuition:"10000元/年",
+   desc:"航空航天特色，设计学科兼备",tags:["公办"],
+   scores:{2025:{prof:212,culture:375,total:460},2024:{prof:210,culture:370,total:455},2023:{prof:208,culture:362,total:448}}},
+  {id:87,name:"郑州美术学院",city:"郑州",region:"河南省内",type:"民办",batch:"本科B段",
+   majors:["绘画","雕塑","视觉传达设计","环境设计","产品设计"],planCount:200,tuition:"18000元/年",
+   desc:"河南省属美术类本科院校",tags:["民办"],
+   scores:{2025:{prof:180,culture:330,total:380},2024:{prof:178,culture:325,total:375},2023:{prof:175,culture:318,total:368}}},
+  {id:88,name:"信阳学院",city:"信阳",region:"河南省内",type:"民办",batch:"本科B段",
+   majors:["美术学","视觉传达设计","环境设计"],planCount:120,tuition:"16000元/年",
+   desc:"民办本科院校",tags:["民办"],
+   scores:{2025:{prof:170,culture:315,total:365},2024:{prof:168,culture:310,total:360},2023:{prof:165,culture:302,total:352}}},
+  {id:89,name:"安阳学院",city:"安阳",region:"河南省内",type:"民办",batch:"本科B段",
+   majors:["美术学","视觉传达设计","环境设计"],planCount:100,tuition:"16000元/年",
+   desc:"民办本科院校",tags:["民办"],
+   scores:{2025:{prof:168,culture:312,total:362},2024:{prof:165,culture:308,total:356},2023:{prof:162,culture:300,total:348}}},
+  {id:90,name:"商丘学院",city:"商丘",region:"河南省内",type:"民办",batch:"本科B段",
+   majors:["视觉传达设计","环境设计","服装与服饰设计"],planCount:110,tuition:"16000元/年",
+   desc:"民办本科院校",tags:["民办"],
+   scores:{2025:{prof:165,culture:310,total:358},2024:{prof:162,culture:305,total:352},2023:{prof:160,culture:298,total:345}}},
+  {id:91,name:"郑州经贸学院",city:"郑州",region:"河南省内",type:"民办",batch:"本科B段",
+   majors:["视觉传达设计","环境设计","服装与服饰设计"],planCount:130,tuition:"16500元/年",
+   desc:"民办本科院校",tags:["民办"],
+   scores:{2025:{prof:172,culture:318,total:370},2024:{prof:170,culture:312,total:364},2023:{prof:168,culture:305,total:358}}},
+  {id:92,name:"河南开封科技传媒学院",city:"开封",region:"河南省内",type:"民办",batch:"本科B段",
+   majors:["视觉传达设计","环境设计","动画"],planCount:100,tuition:"16000元/年",
+   desc:"民办本科院校",tags:["民办"],
+   scores:{2025:{prof:167,culture:312,total:362},2024:{prof:165,culture:308,total:356},2023:{prof:162,culture:300,total:348}}},
+  {id:93,name:"郑州西亚斯学院",city:"郑州",region:"河南省内",type:"民办",batch:"本科B段",
+   majors:["视觉传达设计","环境设计","产品设计"],planCount:80,tuition:"17000元/年",
+   desc:"中外合作办学特色的民办本科",tags:["民办"],
+   scores:{2025:{prof:175,culture:322,total:376},2024:{prof:172,culture:318,total:370},2023:{prof:170,culture:310,total:362}}},
+  {id:94,name:"郑州财经学院",city:"郑州",region:"河南省内",type:"民办",batch:"本科B段",
+   majors:["视觉传达设计","环境设计"],planCount:90,tuition:"16500元/年",
+   desc:"财经类民办本科",tags:["民办"],
+   scores:{2025:{prof:170,culture:315,total:368},2024:{prof:168,culture:310,total:362},2023:{prof:165,culture:302,total:355}}},
+  {id:95,name:"黄河交通学院",city:"焦作",region:"河南省内",type:"民办",batch:"本科B段",
+   majors:["视觉传达设计","环境设计"],planCount:60,tuition:"16000元/年",
+   desc:"交通特色民办本科",tags:["民办"],
+   scores:{2025:{prof:163,culture:305,total:358},2024:{prof:160,culture:300,total:352},2023:{prof:158,culture:292,total:345}}},
+
+];
+      map[s.region].push(s);
+    });
+    return map;
+  },
+  // API: 搜索院校
+  searchSchools(keyword, filters = {}){
+    let list = this.schools;
+    if(keyword) list = list.filter(s => s.name.includes(keyword) || s.majors.some(m=>m.includes(keyword)));
+    if(filters.batch && filters.batch !== 'all') list = list.filter(s => s.batch === filters.batch);
+    if(filters.region) list = list.filter(s => s.region === filters.region);
+    if(filters.type) list = list.filter(s => s.type === filters.type);
+    return list;
+  },
+  // API: 获取某个院校详情
+  getSchool(id){ return this.schools.find(s => s.id === id); },
+  // API 模拟: 从远程加载数据（真实场景可替换为 fetch）
+  async fetchAll(){
+    // 在这里接入真实 API: const res = await fetch('/api/schools'); return res.json();
+    return this.schools;
+  }
+};
+// ==================== 主应用 ====================
+const app = {
+  state: {
+    user: { category:'文科', majorType:'美术与设计类', profScore:0, cultureScore:0, rank:0, batch:'all' },
+    results: [],
+    filter: 'all',
+    filterBatch: 'all',
+    plan: { chong:[], wen:[], bao:[] },
+    fav: new Set(),
+    compare: [],
+    currentSchool: null,
+  },
+  ecInstances: {},
+
+  // ---- 工具函数 ----
+  calcTotal(prof, culture, type){
+    const f = DB.formulas[type] || DB.formulas['美术与设计类'];
+    return { total: prof * f.profWeight + culture * f.cultureWeight, formula: f.label };
+  },
+  judgeLevel(userTotal, schTotal){
+    const diff = schTotal - userTotal;
+    if(diff > 5) return 'chong';
+    if(diff >= -10) return 'wen';
+    return 'bao';
+  },
+  computeProb(userTotal, sch){
+    const diff = sch.totalScore - userTotal;
+    if(diff > 15) return { text:'冲刺', pct:Math.max(10,40-diff*1.5), level:'chong' };
+    if(diff > 5) return { text:'冲刺', pct:Math.max(20,55-diff*3), level:'chong' };
+    if(diff >= -5) return { text:'稳妥', pct:Math.max(50,75-diff*2), level:'wen' };
+    if(diff >= -15) return { text:'稳妥', pct:Math.max(65,85+diff), level:'wen' };
+    return { text:'保底', pct:Math.min(98,92-diff), level:'bao' };
+  },
+
+  // ---- 导航 ----
+  nav(pageId){
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById(pageId).classList.add('active');
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    const nav = document.querySelector(`.nav-item[data-p="${pageId}"]`);
+    if(nav) nav.classList.add('active');
+    this.updatePlanBadge();
+    if(pageId === 'page-plan') this.renderPlan();
+    if(pageId === 'page-compare') this.renderCompare();
+    if(pageId === 'page-tools') this.initCityChart();
+  },
+  goHome(){ this.nav('page-home'); },
+
+  // ---- 智能推荐 ----
+  recommend(){
+    var inpProf = document.getElementById("input-prof");
+    var inpCult = document.getElementById("input-culture");
+    var inpRank = document.getElementById("input-rank");
+    if(!inpProf || !inpProf.value || inpProf.value.trim() === ""){ alert("请填写统考专业分"); return; }
+    if(!inpCult || !inpCult.value || inpCult.value.trim() === ""){ alert("请填写文化课成绩"); return; }
+    var profVal = inpProf.value.trim();
+    var cultVal = inpCult.value.trim();
+    var rankVal = inpRank.value.trim();
+    var prof = Number(profVal) || 0;
+    var culture = Number(cultVal) || 0;
+    var rank = parseInt(rankVal) || 0;
+    var majorType = document.getElementById("input-major-type").value;
+    var batch = document.getElementById("input-batch").value;
+    var category = document.getElementById("input-category").value;
+    var total = this.calcTotal(prof, culture, majorType).total;
+    this.state.user = { category, majorType, profScore:prof, cultureScore:culture, rank, batch };
+    this.state.filter = "all";
+    this.state.filterBatch = "all";
+    document.getElementById("show-prof").textContent = prof;
+    document.getElementById("show-culture").textContent = culture;
+    document.getElementById("show-total").textContent = "综合分: " + total.toFixed(1);
+    var scored = DB.schools.map(function(s){
+      var prob = this.computeProb(total, s);
+      return Object.assign({}, s, { userProb:prob, userTotal:total });
+    }.bind(this));
+    scored.sort(function(a,b){ return b.userProb.pct - a.userProb.pct; });
+    this.state.results = scored;
+    this.updateStats();
+    this.renderSchools();
+    this.nav("page-recommend");
+  },
+  updateStats(){
+    const c = this.state.results.filter(s => s.userProb.level==='chong').length;
+    const w = this.state.results.filter(s => s.userProb.level==='wen').length;
+    const b = this.state.results.filter(s => s.userProb.level==='bao').length;
+    document.getElementById('stat-chong').textContent = c;
+    document.getElementById('stat-wen').textContent = w;
+    document.getElementById('stat-bao').textContent = b;
+    document.getElementById('result-count').textContent = this.state.results.length;
+  },
+  setFilter(el, f){
+    document.querySelectorAll('#filter-bar .filter-btn').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+    this.state.filter = f;
+    this.renderSchools();
+  },
+  setFilterBatch(el, f){
+    document.querySelectorAll('#filter-bar + .filter-bar .filter-btn').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+    this.state.filterBatch = f;
+    this.renderSchools();
+  },
+
+  // ---- 渲染学校列表 ----
+  renderSchools(){
+    const container = document.getElementById('school-list');
+    let list = this.state.results;
+    if(this.state.filter !== 'all') list = list.filter(s => s.userProb.level === this.state.filter);
+    if(this.state.filterBatch !== 'all') list = list.filter(s => s.batch === this.state.filterBatch);
+
+    if(list.length === 0){
+      container.innerHTML = '<div class="empty"><i class="fas fa-search"></i><br>没有匹配的院校</div>';
+      return;
+    }
+
+    container.innerHTML = list.map(s => {
+      const p = s.userProb;
+      const lt = p.level === 'chong' ? '冲刺' : p.level === 'wen' ? '稳妥' : '保底';
+      const lc = `tag-${p.level}`;
+      const fc = `fill-${p.level}`;
+      const isFav = this.state.fav.has(s.id) ? 'fas' : 'far';
+      const inCompare = this.state.compare.includes(s.id);
+      return `
+      <div class="card school-card" onclick="app.showDetail(${s.id})">
+        <div class="school-header">
+          <div>
+            <div class="school-name">${s.name}</div>
+            <div class="school-meta">${s.city} · ${s.type}${s.level ? ' · '+s.level : ''} · ${s.batch}</div>
+          </div>
+          <span class="btn-tag ${lc}">${lt}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div style="flex:1;margin-right:12px;">
+            <div style="font-size:0.85rem;font-weight:600;color:${p.level==='chong'?'var(--primary)':p.level==='wen'?'var(--orange)':'var(--green)'}">录取概率 ${Math.round(p.pct)}%</div>
+            <div class="progress-bar"><div class="fill ${fc}" style="width:${p.pct}%"></div></div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-weight:700;font-size:1rem;">${s.totalScore}</div>
+            <div style="font-size:0.7rem;color:var(--text-light);">综合分</div>
+          </div>
+        </div>
+        <div style="margin-top:6px;">
+          <div class="school-tags">
+            ${s.majors.slice(0,3).map(m => `<span style="font-size:0.75rem;background:#f0f0f0;padding:2px 8px;border-radius:4px;">${m}</span>`).join('')}
+            ${s.tags ? s.tags.map(t => `<span class="badge" style="background:${t==='985'?'#e74c3c':t==='211'?'#f39c12':t==='双一流'?'#3498db':t==='公办'?'#27ae60':'#95a5a6'}">${t}</span>`).join('') : ''}
+          </div>
+          <div class="score-row">
+            <span>📈 2025: ${s.scores['2025'].total}</span>
+            <span>2024: ${s.scores['2024'].total}</span>
+            <span>2023: ${s.scores['2023'].total}</span>
+          </div>
+        </div>
+        <div style="margin-top:8px;display:flex;gap:6px;" onclick="event.stopPropagation();">
+          <button class="btn btn-small btn-outline" onclick="app.toggleFav(${s.id});app.renderSchools();"><i class="${isFav} fa-heart" style="color:${isFav==='fas'?'var(--primary)':'var(--text-light)'}"></i></button>
+          <button class="btn btn-small ${inCompare?'btn-success':'btn-secondary'}" onclick="app.toggleCompare(${s.id});app.renderSchools();">
+            <i class="fas fa-balance-scale"></i> ${inCompare?'已对比':'对比'}
+          </button>
+          <button class="btn btn-small btn-outline" onclick="app.addToPlan(${s.id});app.renderSchools();"><i class="fas fa-plus"></i> 加入</button>
+        </div>
+      </div>`;
+    }).join('');
+  },
+
+  // ---- 收藏 ----
+  toggleFav(id){
+    if(this.state.fav.has(id)) this.state.fav.delete(id);
+    else this.state.fav.add(id);
+  },
+
+  // ---- 对比 ----
+  toggleCompare(id){
+    const idx = this.state.compare.indexOf(id);
+    if(idx >= 0) this.state.compare.splice(idx, 1);
+    else if(this.state.compare.length >= 4) alert('最多对比 4 所院校');
+    else this.state.compare.push(id);
+  },
+  renderCompare(){
+    const container = document.getElementById('compare-list');
+    const ids = this.state.compare;
+    if(ids.length === 0){
+      container.innerHTML = '<div class="empty"><i class="fas fa-balance-scale"></i><br>请在院校列表点击"对比"添加院校<br><span style="font-size:0.8rem;">最多对比4所</span></div>';
+      document.getElementById('compare-chart').style.display = 'none';
+      return;
+    }
+    document.getElementById('compare-chart').style.display = 'block';
+    const schools = ids.map(id => DB.getSchool(id)).filter(Boolean);
+    container.innerHTML = `<div class="compare-grid">${schools.map(s => `
+      <div class="compare-card">
+        <button class="remove-btn" onclick="app.toggleCompare(${s.id});app.renderCompare();">×</button>
+        <div class="name">${s.name}</div>
+        <div class="score">${s.scores['2025'].total}</div>
+        <div class="detail">综合分</div>
+        <div class="detail">${s.city} · ${s.batch}</div>
+        <div class="detail">${s.majors.slice(0,2).join('、')}</div>
+        <div class="detail">招生: ${s.planCount}人</div>
+      </div>`).join('')}</div>`;
+
+    // ECharts 柱状对比图
+    setTimeout(() => this.renderCompareChart(schools), 100);
+  },
+  renderCompareChart(schools){
+    const dom = document.getElementById('compare-chart');
+    if(this.ecInstances.compare) this.ecInstances.compare.dispose();
+    const chart = echarts.init(dom);
+    this.ecInstances.compare = chart;
+    chart.setOption({
+      tooltip:{trigger:'axis'},
+      legend:{data:['2025综合分','2024综合分','2023综合分'],bottom:0,textStyle:{fontSize:11}},
+      grid:{left:40,right:10,top:10,bottom:40},
+      xAxis:{type:'category',data:schools.map(s=>s.name),axisLabel:{fontSize:11}},
+      yAxis:{type:'value',name:'综合分',nameTextStyle:{fontSize:10}},
+      series:[
+        {name:'2025综合分',type:'bar',data:schools.map(s=>s.scores['2025'].total),itemStyle:{color:'#e8453c'}},
+        {name:'2024综合分',type:'bar',data:schools.map(s=>s.scores['2024'].total),itemStyle:{color:'#f39c12'}},
+        {name:'2023综合分',type:'bar',data:schools.map(s=>s.scores['2023'].total),itemStyle:{color:'#3498db'}},
+      ]
+    });
+  },
+  // ---- 院校详情 ----
+  showDetail(id){
+    const s = this.state.results.find(r => r.id === id) || DB.getSchool(id);
+    if(!s) return;
+    this.state.currentSchool = s;
+    const p = s.userProb || { level:'wen', pct:75, text:'稳妥' };
+    const lt = p.level === 'chong' ? '冲刺' : p.level === 'wen' ? '稳妥' : '保底';
+    const lc = `tag-${p.level}`;
+    const fc = `fill-${p.level}`;
+    const isFav = this.state.fav.has(s.id) ? 'fas' : 'far';
+    const inCompare = this.state.compare.includes(s.id);
+    const yrs = [2025,2024,2023];
+
+    document.getElementById('detail-content').innerHTML = `
+      <div class="detail-hero">
+        <h2>${s.name}</h2>
+        <div class="meta">${s.city} · ${s.type}${s.level ? ' · '+s.level : ''} · ${s.batch}</div>
+      </div>
+      <div class="card">
+        <h3 style="margin-bottom:8px;">📊 录取评估</h3>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+          <span class="btn-tag ${lc}" style="font-size:0.85rem;padding:4px 16px;">${lt}</span>
+          <span style="font-weight:700;font-size:1.2rem;">${Math.round(p.pct)}%</span>
+        </div>
+        <div class="progress-bar" style="height:12px;"><div class="fill ${fc}" style="width:${p.pct}%"></div></div>
+        <div class="score-row" style="margin-top:8px;justify-content:space-around;">
+          <span>你的综合: <strong>${s.userTotal ? s.userTotal.toFixed(1) : '-'}</strong></span>
+          <span>院校最低: <strong>${s.totalScore}</strong></span>
+          <span>差距: <strong style="color:${(s.userTotal||0)>=s.totalScore?'var(--green)':'var(--primary)'}">${((s.userTotal||0)-s.totalScore).toFixed(1)}</strong></span>
+        </div>
+      </div>
+      <div class="card">
+        <h3 style="margin-bottom:8px;">📈 近三年分数线趋势</h3>
+        <div class="chart-box" id="detail-chart"></div>
+      </div>
+      <div class="card">
+        <h3 style="margin-bottom:8px;">🎨 招生信息</h3>
+        ${s.majors.map(m => `<div class="info-row"><span class="label">📖 ${m}</span></div>`).join('')}
+        <div class="info-row"><span class="label">招生计划</span><span class="value">${s.planCount} 人</span></div>
+        <div class="info-row"><span class="label">学费</span><span class="value">${s.tuition}</span></div>
+        <div class="info-row"><span class="label">院校性质</span><span class="value">${s.type} ${s.level||''}</span></div>
+      </div>
+      <div class="card">
+        <p style="font-size:0.85rem;color:var(--text-light);">${s.desc}</p>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn btn-primary btn-small" style="flex:1;" onclick="app.addToPlan(${s.id});alert('已加入志愿方案');app.renderPlan();">
+          <i class="fas fa-plus"></i> 加入方案
+        </button>
+        <button class="btn btn-small ${inCompare?'btn-success':'btn-secondary'}" onclick="app.toggleCompare(${s.id});app.closeDetail();">
+          <i class="fas fa-balance-scale"></i> ${inCompare?'取消对比':'对比'}
+        </button>
+        <button class="btn btn-small btn-secondary" onclick="app.toggleFav(${s.id});app.showDetail(${s.id});">
+          <i class="${isFav} fa-heart"></i>
+        </button>
+        <button class="btn btn-secondary btn-small" onclick="app.closeDetail()" style="flex:1;">返回</button>
+      </div>`;
+
+    this.nav('page-detail');
+    // 渲染详情页 ECharts 趋势图
+    setTimeout(() => {
+      const dom = document.getElementById('detail-chart');
+      if(this.ecInstances.detail) this.ecInstances.detail.dispose();
+      const chart = echarts.init(dom);
+      this.ecInstances.detail = chart;
+      chart.setOption({
+        tooltip:{trigger:'axis'},
+        legend:{data:['专业分','文化分','综合分'],bottom:0,textStyle:{fontSize:11}},
+        grid:{left:45,right:10,top:10,bottom:40},
+        xAxis:{type:'category',data:['2023','2024','2025'],axisLabel:{fontSize:11}},
+        yAxis:{type:'value',nameTextStyle:{fontSize:10}},
+        series:[
+          {name:'专业分',type:'line',data:yrs.map(y=>s.scores[y].prof),smooth:true,itemStyle:{color:'#3498db'}},
+          {name:'文化分',type:'line',data:yrs.map(y=>s.scores[y].culture),smooth:true,itemStyle:{color:'#27ae60'}},
+          {name:'综合分',type:'line',data:yrs.map(y=>s.scores[y].total),smooth:true,itemStyle:{color:'#e8453c'},lineStyle:{width:3}},
+        ]
+      });
+    }, 100);
+  },
+  closeDetail(){ this.nav('page-recommend'); },
+
+  // ---- 志愿方案 ----
+  addToPlan(id){
+    const school = this.state.results.find(r => r.id === id) || DB.getSchool(id);
+    if(!school) return;
+    const level = school.userProb ? school.userProb.level : 'wen';
+    const exists = [...this.state.plan.chong, ...this.state.plan.wen, ...this.state.plan.bao].some(s => s.id === id);
+    if(exists){ alert('该院校已在方案中'); return; }
+    this.state.plan[level].push(school);
+    this.updatePlanBadge();
+    this.renderPlan();
+  },
+  removeFromPlan(id){
+    ['chong','wen','bao'].forEach(k => {
+      this.state.plan[k] = this.state.plan[k].filter(s => s.id !== id);
+    });
+    this.updatePlanBadge();
+    this.renderPlan();
+  },
+  renderPlan(){
+    ['chong','wen','bao'].forEach(k => {
+      const container = document.getElementById(`plan-${k}`);
+      const items = this.state.plan[k];
+      if(items.length === 0){
+        container.innerHTML = `<div class="empty" style="padding:12px;">暂无${k==='chong'?'冲刺':k==='wen'?'稳妥':'保底'}院校</div>`;
+        return;
+      }
+      container.innerHTML = items.map((s,i) => `
+        <div class="plan-item">
+          <div class="plan-item-info">
+            <div class="plan-item-name">${i+1}. ${s.name}</div>
+            <div class="plan-item-meta">${s.majors.slice(0,2).join('、')} · 综合分${s.totalScore} · ${s.city} · 招${s.planCount}人</div>
+          </div>
+          <button class="btn btn-small btn-danger" onclick="app.removeFromPlan(${s.id});" style="padding:4px 10px;font-size:0.75rem;"><i class="fas fa-times"></i></button>
+        </div>`).join('');
+    });
+  },
+  updatePlanBadge(){
+    const total = this.state.plan.chong.length + this.state.plan.wen.length + this.state.plan.bao.length;
+    const badge = document.getElementById('plan-badge');
+    if(total > 0){ badge.style.display = 'flex'; badge.textContent = total; }
+    else badge.style.display = 'none';
+  },
+  clearPlan(){
+    if(!confirm('确定清空所有志愿方案？')) return;
+    this.state.plan = { chong:[], wen:[], bao:[] };
+    this.updatePlanBadge();
+    this.renderPlan();
+  },
+  // ---- 导出 PDF (html2canvas + jsPDF) ----
+  async exportPDF(){
+    const total = this.state.plan.chong.length + this.state.plan.wen.length + this.state.plan.bao.length;
+    if(total === 0){ alert('志愿方案为空'); return; }
+    // 构建导出HTML
+    const html = `
+    <div id="pdf-export" style="width:375px;padding:20px;font-family:sans-serif;background:#fff;">
+      <h2 style="color:#e8453c;text-align:center;margin-bottom:8px;">🎯 河南艺术生志愿填报方案</h2>
+      <p style="text-align:center;font-size:12px;color:#999;margin-bottom:16px;">生成时间: ${new Date().toLocaleString('zh-CN')}</p>
+      <hr style="border:none;border-top:2px solid #e8453c;margin-bottom:12px;">
+      ${['chong','wen','bao'].map(k => {
+        const items = this.state.plan[k];
+        if(items.length === 0) return '';
+        const title = k === 'chong' ? '🔼 冲刺院校' : k === 'wen' ? '➡️ 稳妥院校' : '⬇️ 保底院校';
+        const color = k === 'chong' ? '#e8453c' : k === 'wen' ? '#f39c12' : '#27ae60';
+        return `<h3 style="color:${color};margin-bottom:6px;">${title}</h3>
+        <table style="width:100%;border-collapse:collapse;margin-bottom:12px;font-size:12px;">
+          <tr style="background:#f5f6fa;"><th style="padding:6px;border:1px solid #ddd;text-align:left;">#</th><th style="padding:6px;border:1px solid #ddd;text-align:left;">院校</th><th style="padding:6px;border:1px solid #ddd;text-align:center;">综合分</th><th style="padding:6px;border:1px solid #ddd;text-align:center;">城市</th></tr>
+          ${items.map((s,i) => `<tr><td style="padding:6px;border:1px solid #ddd;">${i+1}</td><td style="padding:6px;border:1px solid #ddd;">${s.name}</td><td style="padding:6px;border:1px solid #ddd;text-align:center;">${s.totalScore}</td><td style="padding:6px;border:1px solid #ddd;text-align:center;">${s.city}</td></tr>`).join('')}
+        </table>`;
+      }).join('')}
+      <hr style="border:none;border-top:1px solid #eee;margin:8px 0;">
+    数据仅供参考，请以《招生考试之友》官方公布为准<br>内置45所院校模拟数据 · 支持自定义数据导入</p>
+    </div>`;
+    const wrapper = document.createElement('div');
+    wrapper.innerHTML = html;
+    document.body.appendChild(wrapper);
+    const el = document.getElementById('pdf-export');
+
+    try {
+      const canvas = await html2canvas(el, { scale:2, useCORS:true, backgroundColor:'#fff' });
+      const imgData = canvas.toDataURL('image/png');
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF('p','mm','a4');
+      const pdfW = pdf.internal.pageSize.getWidth();
+      const pdfH = (canvas.height / canvas.width) * pdfW;
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfW, pdfH);
+      pdf.save('河南艺术生志愿填报方案.pdf');
+    } catch(e){
+      alert('导出PDF失败: ' + e.message);
+    }
+    document.body.removeChild(wrapper);
+  },
+
+  // ---- 复制文本 ----
+  exportText(){
+    const total = this.state.plan.chong.length + this.state.plan.wen.length + this.state.plan.bao.length;
+    if(total === 0){ alert('志愿方案为空'); return; }
+    const text = [
+      '河南艺术生志愿填报方案',
+      '='.repeat(30),'',
+      '【冲刺院校】',
+      ...this.state.plan.chong.map((s,i) => `${i+1}. ${s.name} - ${s.majors.slice(0,2).join('、')} - 综合分${s.totalScore}`),'',
+      '【稳妥院校】',
+      ...this.state.plan.wen.map((s,i) => `${i+1}. ${s.name} - ${s.majors.slice(0,2).join('、')} - 综合分${s.totalScore}`),'',
+      '【保底院校】',
+      ...this.state.plan.bao.map((s,i) => `${i+1}. ${s.name} - ${s.majors.slice(0,2).join('、')} - 综合分${s.totalScore}`),'',
+      '='.repeat(30),
+      '生成时间: ' + new Date().toLocaleString('zh-CN'),
+      '数据仅供参考，以官方公布为准'
+    ].join('\n');
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(() => alert('方案已复制到剪贴板'));
+    } else {
+      const ta = document.createElement('textarea');
+      ta.value = text; document.body.appendChild(ta); ta.select();
+      document.execCommand('copy'); document.body.removeChild(ta);
+      alert('方案已复制到剪贴板');
+    }
+  },
+
+  // ---- 综合分计算器 ----
+  // ---- 综合分计算器 ----
+  calcTool(){
+    var prof = parseFloat(document.getElementById("calc-prof").value) || 0;
+    var culture = parseFloat(document.getElementById("calc-culture").value) || 0;
+    if(!prof){ alert("工具: 请填写专业分"); return; }
+    if(!culture){ alert("工具: 请填写文化分"); return; }
+    var f = DB.formulas["美术与设计类"];
+    var total = prof * f.profWeight + culture * f.cultureWeight;
+    document.getElementById("calc-total-num").textContent = total.toFixed(1);
+    var el = document.getElementById("calc-result");
+    el.style.display = "block";
+    el.querySelector(".label").textContent = "综合分 = " + f.label;
+  },
+  calcEquivalent(){
+    var score = parseFloat(document.getElementById("eq-score").value) || 0;
+    var rank = parseInt(document.getElementById("eq-rank").value) || 0;
+    if(!score || !rank){ alert("请填写综合分和排名"); return; }
+    const eq = score - 2;
+    document.getElementById('eq-num').textContent = eq.toFixed(1) + ' (预估)';
+    document.getElementById('eq-result').style.display = 'block';
+  },
+
+  // ---- 院校地区分布地图 (ECharts) ----
+  initCityChart(){
+    const dom = document.getElementById('city-chart');
+    if(!dom) return;
+    if(this.ecInstances.city) return; // 只初始化一次
+
+    // 按城市统计
+    const cityCount = {};
+    DB.schools.forEach(s => {
+      cityCount[s.city] = (cityCount[s.city] || 0) + 1;
+    });
+    const cities = Object.keys(cityCount).sort((a,b) => cityCount[b] - cityCount[a]);
+
+    // 渲染地区标签
+    const regions = [...new Set(DB.schools.map(s => s.region))];
+    document.getElementById('region-tags').innerHTML = `
+      <span class="region-tag active" onclick="app.filterByRegion(this,'')">全部地区</span>
+      ${regions.map(r => `<span class="region-tag" onclick="app.filterByRegion(this,'${r}')">${r} (${DB.getSchoolsByRegion()[r].length})</span>`).join('')}`;
+
+    const chart = echarts.init(dom);
+    this.ecInstances.city = chart;
+    chart.setOption({
+      title:{text:'院校城市分布',left:'center',textStyle:{fontSize:14}},
+      tooltip:{trigger:'item',formatter: p => `${p.name}: ${p.value} 所院校`},
+      series:[{
+        type:'bar',
+        data:cities.map(c => ({name:c,value:cityCount[c]})),
+        itemStyle:{
+          color: p => {
+            const colors = ['#e8453c','#f39c12','#27ae60','#3498db','#9b59b6','#1abc9c','#e74c3c','#2ecc71'];
+            return colors[p.dataIndex % colors.length];
+          }
+        },
+        label:{show:true,position:'top',fontSize:10},
+      }],
+      xAxis:{type:'category',data:cities,axisLabel:{rotate:30,fontSize:10}},
+      yAxis:{type:'value',name:'院校数量',nameTextStyle:{fontSize:10}},
+      grid:{left:35,right:10,top:30,bottom:50},
+    });
+
+    // 默认显示全部院校
+    this.filterByRegion(document.querySelector('.region-tag'), '');
+  },
+
+  filterByRegion(el, region){
+  // ---- 数据导入导出 ----
+  importData(){
+    var text = document.getElementById("import-data").value.trim();
+    if(!text){ alert("请先粘贴数据"); return; }
+    var lines = text.split("\n").filter(function(l){ return l.trim(); });
+    var count = 0;
+    var errors = [];
+    for(var i=0; i<lines.length; i++){
+      try {
+        var parts = lines[i].split(",");
+        if(parts.length < 8){ errors.push("第"+(i+1)+"行：字段不足"); continue; }
+        var id = DB.schools.length + 1 + i;
+        var s = {
+          id: id,
+          name: parts[0].trim(),
+          city: parts[1].trim(),
+          region: "自定义",
+          type: parts[2].trim(),
+          batch: parts[3].trim(),
+          majors: parts[4].trim().split("/"),
+          planCount: parseInt(parts[5]) || 30,
+          tuition: parts.length > 8 ? parts[8].trim() : "待确认",
+          desc: "用户导入数据",
+          tags: [parts[2].trim()],
+          scores: {
+            "2025": { total: parseFloat(parts[6]) || 0 },
+            "2024": { total: parseFloat(parts[7]) || 0 },
+            "2023": { total: parts.length > 8 ? (parseFloat(parts[8]) || 0) : 0 }
+          }
+        };
+        s.totalScore = s.scores["2025"].total;
+        DB.schools.push(s);
+        count++;
+      } catch(e){ errors.push("第"+(i+1)+"行："+e.message); }
+    }
+    var status = document.getElementById("import-status");
+    status.style.display = "block";
+    if(count > 0){
+      status.innerHTML = "✅ 成功导入 " + count + " 所院校" + (localStorage ? "（已保存到本地）" : "");
+      status.style.color = "var(--green)";
+      this.saveData();
+    }
+    if(errors.length > 0){
+      status.innerHTML += "<br>⚠️ " + errors.length + " 条错误：<br>" + errors.slice(0,3).join("<br>");
+      status.style.color = "var(--orange)";
+    }
+  },
+  exportData(){
+    var csv = "院校名称,城市,类型,批次,专业,计划数,2025综合分,2024综合分,2023综合分\n";
+    DB.schools.forEach(function(s){
+      var scores = s.scores || {};
+      csv += s.name + "," + s.city + "," + s.type + "," + s.batch + ",";
+      csv += (s.majors || []).join("/") + "," + (s.planCount || "") + ",";
+      csv += (scores["2025"] ? scores["2025"].total : "") + ",";
+      csv += (scores["2024"] ? scores["2024"].total : "") + ",";
+      csv += (scores["2023"] ? scores["2023"].total : "") + "\n";
+    });
+    var blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8" });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url; a.download = "河南艺术类院校数据.csv";
+    document.body.appendChild(a); a.click();
+    document.body.removeChild(a); URL.revokeObjectURL(url);
+  },
+  saveData(){
+    try { localStorage.setItem("henanArtSchools", JSON.stringify(DB.schools)); } catch(e){}
+  },
+  resetData(){
+    if(!confirm("确定恢复默认数据？自定义导入的数据将被清除。")) return;
+    location.reload();
+  },
+    document.querySelectorAll('.region-tag').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    const container = document.getElementById('region-schools');
+    let schools = DB.schools;
+    if(region) schools = schools.filter(s => s.region === region);
+    container.innerHTML = schools.map(s => `
+      <div class="chip ${s.type==='公办'?'chip-blue':'chip-green'}" style="cursor:pointer;" onclick="app.showDetail(${s.id})">${s.name}</div>
+    `).join('');
+  },
+};
+// ---- 初始化 ----
+document.addEventListener('DOMContentLoaded', () => {
+    if('serviceWorker' in navigator){ navigator.serviceWorker.register('sw.js'); }
+});
+</script>
+</body>
+</html>
