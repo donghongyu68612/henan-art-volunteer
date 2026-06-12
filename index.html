@@ -832,10 +832,7 @@ const app = {
     compare: [],
     currentSchool: null,
   },
-  ecInstances: {},
-
-  // ---- 工具函数 ----
-  calcTotal(prof, culture, type){
+  ecInstances: {},calcTotal(prof, culture, type){
     const f = DB.formulas[type] || DB.formulas['w5z5'];
     return { total: prof * f.profWeight + culture * f.cultureWeight, formula: f.label };
   },
@@ -847,10 +844,7 @@ const app = {
     if(diff >= -5) return { text:'稳妥', pct:Math.max(50,75-diff*2), level:'wen' };
     if(diff >= -15) return { text:'稳妥', pct:Math.max(65,85+diff), level:'wen' };
     return { text:'保底', pct:Math.min(98,92-diff), level:'bao' };
-  },
-
-  // ---- 实时计算综合分预览 ----
-  liveCalc(){
+  },liveCalc(){
     var prof = parseFloat(document.getElementById("input-prof").value) || 0;
     var culture = parseFloat(document.getElementById("input-culture").value) || 0;
     var el = document.getElementById("calc-preview");
@@ -862,9 +856,7 @@ const app = {
     var f = DB.formulas[formulaType] || DB.formulas['w5z5'];
     var total = prof * f.profWeight + culture * f.cultureWeight;
     el.textContent = total.toFixed(1) + ' 分';
-  },
-  // ---- 导航 ----
-  nav(pageId){
+  },nav(pageId){
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.getElementById(pageId).classList.add('active');
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
@@ -874,10 +866,7 @@ const app = {
     if(pageId === 'page-plan') this.renderPlan();
     if(pageId === 'page-compare') this.renderCompare();
   },
-  goHome(){ this.nav('page-home'); },
-
-  // ---- 智能推荐 ----
-  recommend(){
+  goHome(){ this.nav('page-home'); },recommend(){
     var inpProf = document.getElementById("input-prof");
     var inpCult = document.getElementById("input-culture");
     if(!inpProf || !inpProf.value || inpProf.value.trim() === ""){ alert("请填写统考专业分"); return; }
@@ -930,10 +919,7 @@ const app = {
     el.classList.add('active');
     this.state.filterBatch = f;
     this.renderSchools();
-  },
-
-  // ---- 渲染学校列表 ----
-  renderSchools(){
+  },renderSchools(){
     const container = document.getElementById('school-list');
     let list = this.state.results;
     if(this.state.filter !== 'all') list = list.filter(s => s.userProb.level === this.state.filter);
@@ -987,16 +973,10 @@ const app = {
         </div>
       </div>`;
     }).join('');
-  },
-
-  // ---- 收藏 ----
-  toggleFav(id){
+  },toggleFav(id){
     if(this.state.fav.has(id)) this.state.fav.delete(id);
     else this.state.fav.add(id);
-  },
-
-  // ---- 对比 ----
-  toggleCompare(id){
+  },toggleCompare(id){
     const idx = this.state.compare.indexOf(id);
     if(idx >= 0) this.state.compare.splice(idx, 1);
     else if(this.state.compare.length >= 4) alert('最多对比 4 所院校');
@@ -1043,9 +1023,7 @@ const app = {
         {name:'2023综合分',type:'bar',data:schools.map(s=>s.scores['2023'].total),itemStyle:{color:'#3498db'}},
       ]
     });
-  },
-  // ---- 院校详情 ----
-  showDetail(id){
+  },showDetail(id){
     const s = this.state.results.find(r => r.id === id) || DB.getSchool(id);
     if(!s) return;
     this.state.currentSchool = s;
@@ -1123,10 +1101,7 @@ const app = {
       });
     }, 100);
   },
-  closeDetail(){ this.nav('page-recommend'); },
-
-  // ---- 志愿方案 ----
-  addToPlan(id){
+  closeDetail(){ this.nav('page-recommend'); },addToPlan(id){
     const school = this.state.results.find(r => r.id === id) || DB.getSchool(id);
     if(!school) return;
     const level = school.userProb ? school.userProb.level : 'wen';
@@ -1172,9 +1147,7 @@ const app = {
     this.state.plan = { chong:[], wen:[], bao:[] };
     this.updatePlanBadge();
     this.renderPlan();
-  },
-  // ---- 导出 PDF (html2canvas + jsPDF) ----
-  async exportPDF(){
+  },async exportPDF(){
     const total = this.state.plan.chong.length + this.state.plan.wen.length + this.state.plan.bao.length;
     if(total === 0){ alert('志愿方案为空'); return; }
     // 构建导出HTML
@@ -1234,10 +1207,7 @@ const app = {
       alert('导出PDF失败: ' + e.message);
     }
     document.body.removeChild(wrapper);
-  },
-
-  // ---- 复制文本 ----
-  exportText(){
+  },exportText(){
     const total = this.state.plan.chong.length + this.state.plan.wen.length + this.state.plan.bao.length;
     if(total === 0){ alert('志愿方案为空'); return; }
     const text = [
@@ -1261,10 +1231,7 @@ const app = {
       document.execCommand('copy'); document.body.removeChild(ta);
       alert('方案已复制到剪贴板');
     }
-  },
-
-  // ---- 综合分计算器 ----
-  calcTool(){
+  },calcTool(){
     var prof = parseFloat(document.getElementById("calc-prof").value) || 0;
     var culture = parseFloat(document.getElementById("calc-culture").value) || 0;
     if(!prof){ alert("工具: 请填写专业分"); return; }
@@ -1283,10 +1250,7 @@ const app = {
     const eq = score - 2;
     document.getElementById('eq-num').textContent = eq.toFixed(1) + ' (预估)';
     document.getElementById('eq-result').style.display = 'block';
-  },
-
-  // ---- 院校地区分布地图 (ECharts) ----
-  initCityChart(){
+  },initCityChart(){
     const dom = document.getElementById('city-chart');
     if(!dom) return;
     if(this.ecInstances.city) return; // 只初始化一次
@@ -1339,10 +1303,7 @@ const app = {
     c.innerHTML = schools.map(function(s){
       return '<div class="chip ' + (s.type==='公办'?'chip-blue':'chip-green') + '" style="cursor:pointer;" onclick="app.showDetail(' + s.id + ')">' + s.name + '</div>';
     }).join('');
-  },
-
-  // ---- 数据导入导出 ----
-  importData(){
+  },importData(){
     var text = document.getElementById("import-data").value.trim();
     if(!text){ alert("请先粘贴数据"); return; }
     var lines = text.split("\n").filter(function(l){ return l.trim(); });
@@ -1413,10 +1374,6 @@ const app = {
     location.reload();
   },
 };
-// ---- 初始化 ----
-document.addEventListener('DOMContentLoaded', () => {
-    try { /* ready */ } catch(e) { console.warn('Init error', e); }
-});
 </script>
 </body>
 </html>
