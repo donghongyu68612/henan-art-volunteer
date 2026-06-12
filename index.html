@@ -376,7 +376,7 @@ body{
   </div>
 </div>
 <nav class="bottom-nav">
-    if('serviceWorker' in navigator){ navigator.serviceWorker.register('sw.js'); }
+    try{if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(function(e){console.warn('SW reg failed',e);});}}catch(e){}
   <div class="nav-item" data-p="page-compare" onclick="app.nav('page-compare')"><i class="fas fa-balance-scale"></i><div>对比</div></div>
   <div class="nav-item" data-p="page-plan" onclick="app.nav('page-plan')">
     <i class="fas fa-clipboard-list"></i><div>方案</div>
@@ -1376,8 +1376,7 @@ const app = {
 };
 // ---- 初始化 ----
 document.addEventListener('DOMContentLoaded', () => {
-    if('serviceWorker' in navigator){ navigator.serviceWorker.register('sw.js'); }
-});
+    try{});
 </script>
 </body>
 </html>
