@@ -68,9 +68,6 @@ body{
 .fill-chong{background:var(--primary);}
 .fill-wen{background:var(--orange);}
 .fill-bao{background:var(--green);}
-.tabs{display:flex;background:var(--card-bg);border-radius:var(--radius);overflow:hidden;margin-bottom:12px;box-shadow:var(--shadow);}
-.tab{flex:1;text-align:center;padding:10px 0;font-size:0.85rem;cursor:pointer;color:var(--text-light);border-bottom:2px solid transparent;transition:all .2s;}
-.tab.active{color:var(--primary);border-bottom-color:var(--primary);font-weight:600;}
 .badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:0.75rem;color:#fff;}
 .badge-count{
   position:absolute;top:-4px;right:-4px;min-width:18px;height:18px;
@@ -820,22 +817,8 @@ const DB = {
     });
     return map;
   },
-  // API: 搜索院校
-  searchSchools(keyword, filters = {}){
-    let list = this.schools;
-    if(keyword) list = list.filter(s => s.name.includes(keyword) || s.majors.some(m=>m.includes(keyword)));
-    if(filters.batch && filters.batch !== 'all') list = list.filter(s => s.batch === filters.batch);
-    if(filters.region) list = list.filter(s => s.region === filters.region);
-    if(filters.type) list = list.filter(s => s.type === filters.type);
-    return list;
-  },
   // API: 获取某个院校详情
   getSchool(id){ return this.schools.find(s => s.id === id); },
-  // API 模拟: 从远程加载数据（真实场景可替换为 fetch）
-  async fetchAll(){
-    // 在这里接入真实 API: const res = await fetch('/api/schools'); return res.json();
-    return this.schools;
-  }
 };
 // ==================== 主应用 ====================
 const app = {
@@ -855,12 +838,6 @@ const app = {
   calcTotal(prof, culture, type){
     const f = DB.formulas[type] || DB.formulas['w5z5'];
     return { total: prof * f.profWeight + culture * f.cultureWeight, formula: f.label };
-  },
-  judgeLevel(userTotal, schTotal){
-    const diff = schTotal - userTotal;
-    if(diff > 5) return 'chong';
-    if(diff >= -10) return 'wen';
-    return 'bao';
   },
   computeProb(userTotal, sch){
     const schTotal = sch.totalScore || (sch.scores && sch.scores["2025"] && sch.scores["2025"].total) || 0;
@@ -1286,7 +1263,6 @@ const app = {
     }
   },
 
-  // ---- 综合分计算器 ----
   // ---- 综合分计算器 ----
   calcTool(){
     var prof = parseFloat(document.getElementById("calc-prof").value) || 0;
