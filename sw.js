@@ -1,4 +1,4 @@
-const CACHE = 'henan-art-v8';
+const CACHE = 'henan-art-v9';
 const STATIC_CACHE = 'henan-art-static-v8';
 
 const PRECACHE = [
