@@ -1,7 +1,7 @@
 {
   "name": "henan-art-volunteer",
-  "version": "2.3.0",
-  "description": "河南艺术生志愿填报助手 — 智能推荐·冲稳保分析·一键导出PDF",
+  "version": "3.0.0",
+  "description": "河南艺术生美术与设计志愿填报助手 v3.0 - 2026招生数据、2023-2025一分一段排名、智能志愿推荐",
   "private": true,
   "scripts": {
     "build": "node scripts/build.js",
@@ -11,7 +11,14 @@
     "type": "git",
     "url": "git+https://github.com/donghongyu68612/henan-art-volunteer.git"
   },
-  "keywords": ["高考志愿", "艺术生", "河南", "志愿填报", "PWA"],
+  "keywords": [
+    "高考志愿",
+    "美术与设计",
+    "艺术生",
+    "河南",
+    "志愿填报",
+    "PWA"
+  ],
   "author": "",
   "license": "MIT",
   "bugs": {

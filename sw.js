@@ -1,5 +1,5 @@
-const CACHE = 'henan-art-v7';
-const STATIC_CACHE = 'henan-art-static-v7';
+const CACHE = 'henan-art-v8';
+const STATIC_CACHE = 'henan-art-static-v8';
 
 const PRECACHE = [
   'manifest.json',
