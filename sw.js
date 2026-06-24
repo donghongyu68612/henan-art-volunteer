@@ -33,7 +33,7 @@ self.addEventListener('install', e => {
   );
 });
 
-// Activate: clean old caches
+// Activate: clean old caches, then tell all open clients to reload
 self.addEventListener('activate', e => {
   e.waitUntil(
     caches.keys().then(keys =>
@@ -41,6 +41,12 @@ self.addEventListener('activate', e => {
         keys.filter(k => k !== CACHE && k !== STATIC_CACHE).map(k => caches.delete(k))
       )
     ).then(() => self.clients.claim())
+    .then(() => self.clients.matchAll({ type: 'window' }))
+    .then(clients => {
+      clients.forEach(client => {
+        client.postMessage({ action: 'reload' });
+      });
+    })
   );
 });
 
