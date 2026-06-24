@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="description" content="河南艺术生高考志愿填报智能推荐工具 — 冲稳保分析、院校对比、一键导出PDF">
-<title>河南艺术生美术与设计志愿填报助手 v3.0</title>
+<meta name="description" content="河南美术与设计高考志愿填报智能推荐工具 — 冲稳保分析、院校对比、一键导出PDF">
+<title>河南美术与设计志愿填报助手 v3.0</title>
 <link rel="manifest" href="manifest.json">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="志愿助手">
 <meta name="theme-color" content="#e8453c">
-<meta property="og:title" content="河南艺术生志愿填报助手">
+<meta property="og:title" content="河南美术与设计志愿填报助手">
 <meta property="og:description" content="智能推荐·冲稳保分析·一键导出PDF">
 <meta property="og:type" content="website">
 <meta property="og:image" content="icons/icon-512.png">
@@ -30,7 +30,7 @@
 <!-- Page: Home -->
 <div id="page-home" class="page active">
   <div class="header">
-    <h1>🎯 河南艺术生志愿填报助手</h1>
+    <h1>🎯 河南美术与设计志愿填报助手</h1>
     <p>智能推荐·冲稳保分析·一键导出2026 <span>v3.0 新版</span></p>
   </div>
   <div style="display:flex;gap:8px;margin-bottom:16px;">
@@ -85,7 +85,7 @@
     </div>
   </div>
   <button class="btn btn-primary" onclick="app.recommend()" style="margin-top:8px;">🎯 智能推荐院校</button>
-  <p style="text-align:center;font-size:0.75rem;color:var(--text-light);margin-top:12px;">数据仅供参考，请以《招生考试之友》官方公布为准<br>内置95所院校模拟数据</p>
+  <p style="text-align:center;font-size:0.75rem;color:var(--text-light);margin-top:12px;">数据仅供参考，请以河南省教育考试院及招生院校官方公布为准<br>院校、专业和招生计划信息以官方最新发布为准</p>
 </div>
 
 <!-- Page: Recommend -->
@@ -165,7 +165,7 @@
 
 <!-- Page: About -->
 <div id="page-about" class="page" style="overflow-x:hidden;">
-  <div class="header"><h1>ℹ️ 关于</h1><p>河南艺术生志愿填报助手 2026</p></div>
+  <div class="header"><h1>ℹ️ 关于</h1><p>河南美术与设计志愿填报助手 2026</p></div>
   <div class="card">
     <h3>🎯 使用说明</h3>
     <ol style="padding-left:16px;font-size:0.8rem;color:var(--text-light);line-height:2;">
@@ -179,7 +179,7 @@
     <h3>⚠️ 重要声明</h3>
     <p style="font-size:0.85rem;color:var(--text-light);line-height:1.8;">
       本工具数据来源于公开渠道整理，仅供填报参考。<br>
-      最终志愿请以 <strong>《招生考试之友》</strong> 和 <strong>河南省教育考试院官网</strong> 公布为准。
+      最终志愿请以 <strong>河南省教育考试院官网</strong> 及 <strong>招生院校官方发布</strong> 为准。
     </p>
   </div>
 </div>
@@ -203,6 +203,64 @@ formulas: {
 'w8z2': { profWeight:0.5,  cultureWeight:0.8, label:'文8专2：文化×0.8+专业×0.5' },
 'culture': { profWeight:0, cultureWeight:1.0, label:'仅文化：按文化分排序' },
 },
+// 2023-2026年河南省美术与设计类录取控制线（仅保留本工具相关类别）
+controlLines: {
+2026: {
+province: '河南',
+source: '2026年河南省普通高校招生录取控制分数线.docx',
+category: '艺术类·省统考专业',
+majorType: '美术与设计类',
+culture: {
+undergraduate: { history: 323, physics: 332 },
+specialty: { history: 159, physics: 159 }
+},
+professional: { undergraduate: 189, specialty: 175 },
+notes: [
+'普通高职(专科)提前批执行普通高职(专科)批录取控制分数线',
+'使用校考成绩录取的专业，文化录取控制分数线执行河南省普通类相应历史类、物理类普通本科批分数线'
+]
+},
+2024: {
+province: '河南',
+source: '河南2025版艺术类录取统计 2023-2024年艺术类和体育类录取控制分数线和报考情况统计.docx',
+category: '艺术类·省统考专业',
+majorType: '美术与设计类',
+culture: { undergraduate: 300, specialty: 165 },
+professional: { undergraduate: 200, specialty: 180 },
+sameForArtsAndScience: true,
+notes: ['艺术类省统考专业文、理科执行相同录取控制分数线']
+},
+2023: {
+province: '河南',
+source: '河南2025版艺术类录取统计 2023-2024年艺术类和体育类录取控制分数线和报考情况统计.docx',
+category: '艺术类·省统考专业',
+majorType: '美术类',
+aliasOf: '美术与设计类',
+culture: { undergraduateA: 370, undergraduateB: 358, specialty: 165 },
+professional: { undergraduateA: 216, undergraduateB: 200, specialty: 182 },
+sameForArtsAndScience: true,
+notes: ['艺术类文、理科执行相同录取控制分数线，艺术本科提前批执行艺术本科A段分数线']
+}
+},
+// 2023-2024年河南省美术/美术与设计类省统考报考及合格人数
+examStats: {
+2024: {
+source: '河南2025版艺术类录取统计 2023-2024年艺术类和体育类录取控制分数线和报考情况统计.docx',
+majorType: '美术与设计类',
+liberalArts: { applicants: 57029, qualified: 51558 },
+science: { applicants: 8443, qualified: 7752 },
+total: { applicants: 65472, qualified: 59310, passRate: 0.9059 }
+},
+2023: {
+source: '河南2025版艺术类录取统计 2023-2024年艺术类和体育类录取控制分数线和报考情况统计.docx',
+majorType: '美术类',
+aliasOf: '美术与设计类',
+liberalArts: { applicants: 59825, qualified: 54358 },
+science: { applicants: 10241, qualified: 9398 },
+total: { applicants: 70066, qualified: 63756, passRate: 0.9099 }
+}
+},
+// 院校数据 - 45所真实风格
 // 院校数据 - 45所真实风格
 schools: [
 {id:1,name:"郑州大学",
@@ -3237,12 +3295,20 @@ fav: new Set(),
 compare: [],
 currentSchool: null,
 },
-ecInstances: {},calcTotal(prof, culture, type){
+ecInstances: {},scoreOf(s, year, key){
+const row = s && s.scores && s.scores[String(year)];
+if(!row) return '';
+if(key) return row[key] ?? '';
+return row.total ?? '';
+},
+hasHistory(s){ return !!this.scoreOf(s, 2025, 'total'); },
+historyLabel(s){ return this.hasHistory(s) ? '' : '暂无历史分数'; },calcTotal(prof, culture, type){
 const f = DB.formulas[type] || DB.formulas['w5z5'];
 return { total: prof * f.profWeight + culture * f.cultureWeight, formula: f.label };
 },
 computeProb(userTotal, sch){
-const schTotal = sch.totalScore || (sch.scores && sch.scores["2025"] && sch.scores["2025"].total) || 0;
+const schTotal = sch.totalScore || this.scoreOf(sch, 2025, 'total') || 0;
+if(!schTotal) return { text:'参考', pct:0, level:'bao' };
 const diff = schTotal - userTotal;
 if(diff > 15) return { text:'冲刺', pct:Math.max(10,40-diff*1.5), level:'chong' };
 if(diff > 5) return { text:'冲刺', pct:Math.max(20,55-diff*3), level:'chong' };
@@ -3295,7 +3361,7 @@ var prob = this.computeProb(total, s);
 return Object.assign({}, s, {
 userProb: prob,
 userTotal: total,
-totalScore: s.totalScore || (s.scores && s.scores["2025"] && s.scores["2025"].total) || 0
+totalScore: s.totalScore || this.scoreOf(s, 2025, 'total') || 0
 });
 }.bind(this));
 scored.sort(function(a,b){ return b.userProb.pct - a.userProb.pct; });
@@ -3355,7 +3421,7 @@ return `
 </div>
 <div style="margin-bottom:4px;">
 <span>录取概率 ${Math.round(p.pct)}%</span>
-<span style="float:right;">${s.totalScore || (s.scores?.["2025"]?.total) || ''} 综合分</span>
+<span style="float:right;">${s.totalScore || this.scoreOf(s, 2025, 'total') || this.historyLabel(s)}${(s.totalScore || this.scoreOf(s, 2025, 'total')) ? ' 综合分' : ''}</span>
 </div>
 <div class="progress-bar"><div class="fill ${fc}" style="width:${p.pct}%"></div></div>
 <div style="margin-top:6px;">
@@ -3364,9 +3430,9 @@ ${s.majors.slice(0,3).map(m => `<span style="font-size:0.75rem;background:#f0f0f
 ${s.tags ? s.tags.map(t => `<span class="badge" style="background:${t==='985'?'#e74c3c':t==='211'?'#f39c12':t==='双一流'?'#3498db':t==='公办'?'#27ae60':'#95a5a6'}">${t}</span>`).join('') : ''}
 </div>
 <div class="score-row">
-<span>📈 2025: ${s.scores['2025'].total}分 专业位次${s.scores['2025'].rank||'-'}</span>
-<span>2024: ${s.scores['2024'].total}分</span>
-<span>2023: ${s.scores['2023'].total}分</span>
+<span>📈 2025: ${this.scoreOf(s, 2025, 'total') || this.historyLabel(s)}${this.scoreOf(s, 2025, 'total') ? '分' : ''} ${this.scoreOf(s, 2025, 'rank') ? '专业位次' + this.scoreOf(s, 2025, 'rank') : ''}</span>
+<span>2024: ${this.scoreOf(s, 2024, 'total') || '-'}${this.scoreOf(s, 2024, 'total') ? '分' : ''}</span>
+<span>2023: ${this.scoreOf(s, 2023, 'total') || '-'}${this.scoreOf(s, 2023, 'total') ? '分' : ''}</span>
 </div>
 </div>
 <div style="margin-top:8px;display:flex;gap:6px;" onclick="event.stopPropagation();">
@@ -3401,7 +3467,7 @@ container.innerHTML = `<div class="compare-grid">${schools.map(s => `
 <div class="compare-card">
 <button class="remove-btn" onclick="app.toggleCompare(${s.id});app.renderCompare();">×</button>
 <div class="name">${s.name}</div>
-<div class="score">${s.scores['2025'].total}</div>
+<div class="score">${this.scoreOf(s, 2025, 'total') || '-'}</div>
 <div class="detail">综合分</div>
 <div class="detail">${s.city} · ${s.batch}</div>
 <div class="detail">${s.majors.slice(0,2).join('、')}</div>
@@ -3423,9 +3489,9 @@ grid:{left:40,right:10,top:10,bottom:40},
 xAxis:{type:'category',data:schools.map(s=>s.name),axisLabel:{fontSize:11}},
 yAxis:{type:'value',name:'综合分',nameTextStyle:{fontSize:10}},
 series:[
-{name:'2025综合分',type:'bar',data:schools.map(s=>s.scores['2025'].total),itemStyle:{color:'#e8453c'}},
-{name:'2024综合分',type:'bar',data:schools.map(s=>s.scores['2024'].total),itemStyle:{color:'#f39c12'}},
-{name:'2023综合分',type:'bar',data:schools.map(s=>s.scores['2023'].total),itemStyle:{color:'#3498db'}},
+{name:'2025综合分',type:'bar',data:schools.map(s=>this.scoreOf(s, 2025, 'total') || 0),itemStyle:{color:'#e8453c'}},
+{name:'2024综合分',type:'bar',data:schools.map(s=>this.scoreOf(s, 2024, 'total') || 0),itemStyle:{color:'#f39c12'}},
+{name:'2023综合分',type:'bar',data:schools.map(s=>this.scoreOf(s, 2023, 'total') || 0),itemStyle:{color:'#3498db'}},
 ]
 });
 },showDetail(id){
@@ -3499,9 +3565,9 @@ grid:{left:45,right:10,top:10,bottom:40},
 xAxis:{type:'category',data:['2023','2024','2025'],axisLabel:{fontSize:11}},
 yAxis:{type:'value',nameTextStyle:{fontSize:10}},
 series:[
-{name:'专业分',type:'line',data:yrs.map(y=>s.scores[y].prof),smooth:true,itemStyle:{color:'#3498db'}},
-{name:'文化分',type:'line',data:yrs.map(y=>s.scores[y].culture),smooth:true,itemStyle:{color:'#27ae60'}},
-{name:'综合分',type:'line',data:yrs.map(y=>s.scores[y].total),smooth:true,itemStyle:{color:'#e8453c'},lineStyle:{width:3}},
+{name:'专业分',type:'line',data:yrs.map(y=>this.scoreOf(s, y, 'prof') || 0),smooth:true,itemStyle:{color:'#3498db'}},
+{name:'文化分',type:'line',data:yrs.map(y=>this.scoreOf(s, y, 'culture') || 0),smooth:true,itemStyle:{color:'#27ae60'}},
+{name:'综合分',type:'line',data:yrs.map(y=>this.scoreOf(s, y, 'total') || 0),smooth:true,itemStyle:{color:'#e8453c'},lineStyle:{width:3}},
 ]
 });
 }, 100);
@@ -3535,7 +3601,7 @@ container.innerHTML = items.map((s,i) => `
 <div class="plan-item">
 <div class="plan-item-info">
 <div class="plan-item-name">${i+1}. ${s.name} [${s.schoolCode||''}]</div>
-<div class="plan-item-meta">${s.majors.slice(0,2).map(m => m.name||m).join('、')} · 综合分${s.totalScore || (s.scores?.["2025"]?.total) || ''} · ${s.city} · 招${s.planCount}人 · ${s.tuition||''}</div>
+<div class="plan-item-meta">${s.majors.slice(0,2).map(m => m.name||m).join('、')} · 综合分${s.totalScore || this.scoreOf(s, 2025, 'total') || this.historyLabel(s)} · ${s.city} · 招${s.planCount}人 · ${s.tuition||''}</div>
 </div>
 <button class="btn btn-small btn-danger" onclick="app.removeFromPlan(${s.id});" style="padding:4px 10px;font-size:0.75rem;"><i class="fas fa-times"></i></button>
 </div>`).join('');
@@ -3558,7 +3624,7 @@ if(total === 0){ alert('志愿方案为空'); return; }
 // 构建导出HTML
 const html = `
 <div id="pdf-export" style="width:620px;padding:20px;font-family:sans-serif;background:#fff;">
-<h2 style="color:#e8453c;text-align:center;margin-bottom:8px;">🎯 河南艺术生志愿填报方案</h2>
+<h2 style="color:#e8453c;text-align:center;margin-bottom:8px;">🎯 河南美术与设计志愿填报方案</h2>
 <p style="text-align:center;font-size:12px;color:#999;margin-bottom:16px;">生成时间: ${new Date().toLocaleString('zh-CN')}</p>
 <hr style="border:none;border-top:2px solid #e8453c;margin-bottom:12px;">
 ${['chong','wen','bao'].map(k => {
@@ -3573,8 +3639,9 @@ ${items.map(function(s,i){
 var ms=(s.majors||[]).map(function(m){return m.name||m;}).join('、');
 if(!ms)ms='--';
 var sc=s.schoolCode||'';
-var tot=s.totalScore||(s.scores&&s.scores["2025"]&&s.scores["2025"].total)||'';
-var rk=s.scores&&s.scores["2025"]&&s.scores["2025"].rank||'';
+var scoreOf=function(o,year,key){var row=o&&o.scores&&o.scores[String(year)]; if(!row)return ''; return key ? (row[key] ?? '') : (row.total ?? '');};
+var tot=s.totalScore||scoreOf(s,2025,'total')||'';
+var rk=scoreOf(s,2025,'rank')||'';
 var bt=s.batch||'';
 var tu=s.tuition||'';
 return '<tr><td style="padding:2px;border:1px solid #ddd;text-align:center;">'+(i+1)+'</td><td style="padding:2px;border:1px solid #ddd;">'+s.name+'</td><td style="padding:2px;border:1px solid #ddd;text-align:center;">'+sc+'</td><td style="padding:2px;border:1px solid #ddd;text-align:center;">'+tot+'</td><td style="padding:2px;border:1px solid #ddd;">'+ms+'</td><td style="padding:2px;border:1px solid #ddd;text-align:center;">'+rk+'</td><td style="padding:2px;border:1px solid #ddd;text-align:center;">'+s.city+'</td><td style="padding:2px;border:1px solid #ddd;text-align:center;">'+bt+'</td><td style="padding:2px;border:1px solid #ddd;text-align:center;">'+tu+'</td></tr>';
@@ -3582,7 +3649,7 @@ return '<tr><td style="padding:2px;border:1px solid #ddd;text-align:center;">'+(
 </table>`;
 }).join('')}
 <hr style="border:none;border-top:1px solid #eee;margin:8px 0;">
-<div style="font-size:9px;color:#999;text-align:center;">数据仅供参考，请以《招生考试之友》官方公布为准</div>
+<div style="font-size:9px;color:#999;text-align:center;">数据仅供参考，请以河南省教育考试院及招生院校官方公布为准</div>
 </div>`;
 const wrapper = document.createElement('div');
 wrapper.innerHTML = html;
@@ -3607,7 +3674,7 @@ if (pg > 0) pdf.addPage();
 pdf.addImage(img, 'PNG', 0, 0, pageW, (curH / canvas.width) * pageW);
 srcY += curH; remainingH -= curH; pg++;
 }
-pdf.save('河南艺术生志愿填报方案.pdf');
+pdf.save('河南美术与设计志愿填报方案.pdf');
 } catch(e){
 alert('导出PDF失败: ' + e.message);
 }
@@ -3616,14 +3683,14 @@ document.body.removeChild(wrapper);
 const total = this.state.plan.chong.length + this.state.plan.wen.length + this.state.plan.bao.length;
 if(total === 0){ alert('志愿方案为空'); return; }
 const text = [
-'河南艺术生志愿填报方案',
+'河南美术与设计志愿填报方案',
 '='.repeat(30),'',
 '【冲刺院校】',
-...this.state.plan.chong.map((s,i) => `${i+1}. ${s.name} [${s.schoolCode||''}] - ${(s.majors||[]).slice(0,2).map(m => m.name||m).join('、')} - 综合分${s.totalScore || (s.scores?.["2025"]?.total) || ''} - ${s.city} - ${s.batch||''}`),'',
+...this.state.plan.chong.map((s,i) => `${i+1}. ${s.name} [${s.schoolCode||''}] - ${(s.majors||[]).slice(0,2).map(m => m.name||m).join('、')} - 综合分${s.totalScore || this.scoreOf(s, 2025, 'total') || this.historyLabel(s)} - ${s.city} - ${s.batch||''}`),'',
 '【稳妥院校】',
-...this.state.plan.wen.map((s,i) => `${i+1}. ${s.name} [${s.schoolCode||''}] - ${(s.majors||[]).slice(0,2).map(m => m.name||m).join('、')} - 综合分${s.totalScore || (s.scores?.["2025"]?.total) || ''} - ${s.city} - ${s.batch||''}`),'',
+...this.state.plan.wen.map((s,i) => `${i+1}. ${s.name} [${s.schoolCode||''}] - ${(s.majors||[]).slice(0,2).map(m => m.name||m).join('、')} - 综合分${s.totalScore || this.scoreOf(s, 2025, 'total') || this.historyLabel(s)} - ${s.city} - ${s.batch||''}`),'',
 '【保底院校】',
-...this.state.plan.bao.map((s,i) => `${i+1}. ${s.name} [${s.schoolCode||''}] - ${(s.majors||[]).slice(0,2).map(m => m.name||m).join('、')} - 综合分${s.totalScore || (s.scores?.["2025"]?.total) || ''} - ${s.city} - ${s.batch||''}`),'',
+...this.state.plan.bao.map((s,i) => `${i+1}. ${s.name} [${s.schoolCode||''}] - ${(s.majors||[]).slice(0,2).map(m => m.name||m).join('、')} - 综合分${s.totalScore || this.scoreOf(s, 2025, 'total') || this.historyLabel(s)} - ${s.city} - ${s.batch||''}`),'',
 '='.repeat(30),
 '生成时间: ' + new Date().toLocaleString('zh-CN'),
 '数据仅供参考，以官方公布为准'
@@ -3737,7 +3804,8 @@ scores: {
 "2023": { total: parts.length > 8 ? (parseFloat(parts[8]) || 0) : 0 }
 }
 };
-s.totalScore = s.scores["2025"].total;
+var importScore2025 = s.scores && s.scores["2025"];
+s.totalScore = importScore2025 ? (importScore2025.total || 0) : 0;
 DB.schools.push(s);
 count++;
 } catch(e){ errors.push("第"+(i+1)+"行："+e.message); }
